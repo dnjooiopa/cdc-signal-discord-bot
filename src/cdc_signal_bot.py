@@ -1,4 +1,4 @@
-from cdc_factory import init, refetch, get_signals_with_tf, get_all_signals
+from src.cdc_factory import init, refetch, get_signals_with_tf, get_all_signals
 from config import CRYPTO_CHANNEL
 
 import threading

@@ -119,7 +119,7 @@ def refetch():
             else:
                 fetch_crypto_pairs(pairs)
 
-    with open(os.path.join(os.getcwd(), "crypto-data.json"), "w") as outfile:
+    with open(os.path.join(os.getcwd(), "src", "crypto-data.json"), "w") as outfile:
         json.dump(cryptoData, outfile, indent=4)
         outfile.close()
 
@@ -128,12 +128,12 @@ def init():
     global allPairs, cryptoData
     print("Application starting...")
 
-    with open(os.path.join(os.getcwd(), "crypto-info.json")) as cryptoInfoFile:
+    with open(os.path.join(os.getcwd(), "src", "crypto-info.json")) as cryptoInfoFile:
         data = json.load(cryptoInfoFile)
         allPairs = data['pairs']
         cryptoInfoFile.close()
 
-    with open(os.path.join(os.getcwd(), "crypto-data.json")) as cryptoDataFile:
+    with open(os.path.join(os.getcwd(), "src", "crypto-data.json")) as cryptoDataFile:
         data = json.load(cryptoDataFile)
         cryptoData = data
         cryptoDataFile.close()
