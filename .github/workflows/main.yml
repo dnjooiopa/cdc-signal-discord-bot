@@ -39,6 +39,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
-          context: ./core/api-server
-          file: ./core/api-server/Dockerfile
+          context: .
+          file: Dockerfile
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}:${{ env.RELEASE_VERSION }}
