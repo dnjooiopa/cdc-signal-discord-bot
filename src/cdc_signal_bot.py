@@ -1,5 +1,5 @@
 from cdc_factory import init, refetch, get_signals_with_tf, get_all_signals
-from config import BOT_TOKEN
+from config import BOT_TOKEN, CRYPTO_CHANNEL
 
 import threading
 from datetime import datetime
@@ -14,13 +14,17 @@ async def on_ready():
   print("Bot Started!")
 
 @bot.event
-async def on_message(message) :
+async def on_message(message):
+  print('Incoming message')
+  print(message)
+
   msgContent = message.content
   msg = 'พิมพ์ให้ถูกดิ๊ ควย!!!'
   if msgContent.startswith('!cdc') :
     contents = msgContent.split(' ')
-    print(message)
-    print('Incoming message:', contents)
+    print('contents')
+    print(contents)
+
     if len(contents) == 2:
       if contents[1] == 'signal':
         msg = get_all_signals(0)
@@ -37,14 +41,16 @@ def runThread():
 
     now = datetime.now()
 
+    current_hour_minute = now.strftime("%H:%M")
     current_time = now.strftime("%H:%M:%S")
-    print("\rCurrent Time =", current_time)
+    if current_hour_minute == "00:00":
+      print("\rCurrent Time =", current_time)
 
     if(current_time == '00:00:30'):  # check if matches with the desired time
-        channel = bot.get_channel(902555809580449822)
+        channel = bot.get_channel(CRYPTO_CHANNEL)
         refetch()
         msg = get_all_signals(0)
         channel.send(msg)
-#runThread()
+runThread()
 
 bot.run(BOT_TOKEN)
