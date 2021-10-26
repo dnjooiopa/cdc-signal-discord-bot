@@ -1,5 +1,5 @@
 from cdc_factory import init, refetch, get_signals_with_tf, get_all_signals
-from config import BOT_TOKEN, CRYPTO_CHANNEL
+from config import CRYPTO_CHANNEL
 
 import threading
 from datetime import datetime
@@ -52,5 +52,3 @@ def runThread():
         msg = get_all_signals(0)
         channel.send(msg)
 runThread()
-
-bot.run(BOT_TOKEN)
