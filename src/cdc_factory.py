@@ -148,36 +148,33 @@ def init():
 def get_signal_with_pairs(tf, pairs, dayOffset):
     (buy, sell, noSignal, timestamp, closingPrice) = get_signal(tf, pairs, dayOffset)
     formatTime = get_format_time(timestamp)
-    buyMsg = ''
-    sellMsg = ''
+    msg = ''
     if buy:
-        buyMsg = f'\n{formatTime} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
+        msg = f'\n{formatTime} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
     elif sell:
-        buyMsg = f'\n{formatTime} : {pairs.upper()} : SELL 🔴 at {closingPrice}$'
+        msg = f'\n{formatTime} : {pairs.upper()} : SELL 🔴 at {closingPrice}$'
 
-    return buyMsg, sellMsg
+    return msg
 
 def get_signals_with_tf(tf, dayOffset):
     tfName = '✅ Time frame 1 day'
     if tf == '43200':
         tfName = '✅ Time frame 12 hours'
 
-    buyMsgs = f'\n{tfName}'
-    sellMsgs = f'\n'
+    msg = f'\n{tfName}'
 
     for pairs in allPairs:
-        buyMsg, sellMsg = get_signal_with_pairs(tf, pairs, dayOffset)
-        buyMsgs+=buyMsg
-        sellMsgs+=sellMsg     
-    
-    return buyMsgs, sellMsgs
-
+        signalMsg = get_signal_with_pairs(tf, pairs, dayOffset)
+        msg += signalMsg
+    if 'BUY' not in msg and 'SELL' not in msg:
+        msg += '\nNo signal'
+    return msg
 
 def get_all_signals(dayOffset):
     msg = ''
     for tf in periods:
-        buyMsg, sellMsg = get_signals_with_tf(tf, dayOffset)
-        msg += buyMsg + sellMsg
+        signalMsg = get_signals_with_tf(tf, dayOffset)
+        msg += signalMsg
 
     return msg
 
