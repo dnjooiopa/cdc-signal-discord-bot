@@ -158,9 +158,9 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
     return buyMsg, sellMsg
 
 def get_signals_with_tf(tf, dayOffset):
-    tfName = 'Time frame 1 day'
+    tfName = '✅ Time frame 1 day'
     if tf == '43200':
-        tfName = 'Time frame 12 hours'
+        tfName = '✅ Time frame 12 hours'
 
     buyMsgs = f'\n{tfName}'
     sellMsgs = f'\n'
