@@ -202,10 +202,12 @@ def check_pairs(pairs):
   url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
   result = make_request(url)
   return result
-  # msg = f'❌ Pairs not found : {pairs.upper()}'
-  # if result is not None:
-  #   msg = f'✅ Pairs added : {pairs.upper()}'
-  # return msg
+
+def check_if_pairs_exists(pairs):
+  if pairs in allPairs:
+    return f'✅ Pairs already exists : {pairs.upper()}'
+  else:
+    return f'❌ Pairs does not exists : {pairs.upper()}'
 
 def add_pairs(pairs): 
   if pairs in allPairs:

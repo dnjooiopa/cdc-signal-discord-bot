@@ -1,4 +1,4 @@
-from src.cdc_factory import add_pairs, check_pairs, init, get_availabel_pairs
+from src.cdc_factory import add_pairs, check_if_pairs_exists, check_pairs, init, get_availabel_pairs
 
 
 def start_test():
@@ -16,4 +16,7 @@ def start_test():
   print(add_pairs('btcthb'))
   print(add_pairs('dydxusdt'))
 
+  print("=== Check if Pairs exists ===")
+  print(check_if_pairs_exists('btcusdt'))
+  print(check_if_pairs_exists('btcthb'))
 
