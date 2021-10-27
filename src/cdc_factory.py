@@ -178,3 +178,6 @@ def get_all_signals(dayOffset):
 
     return msg
 
+
+def get_availabel_pairs():
+    return ','.join([x.upper() for x in allPairs])
