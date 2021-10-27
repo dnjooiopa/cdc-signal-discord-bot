@@ -120,8 +120,9 @@ def refetch():
                     fetch_crypto_pairs(pairs)
             else:
                 fetch_crypto_pairs(pairs)
+            print(f'Successfully fetched : {pairs.upper()} with tf {tf}')
     t2 = time.time()
-    print(f'Successfully fetched : f{t2 - t1} seconds')
+    print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
 
     with open(os.path.join(os.getcwd(), "src", "crypto-data.json"), "w") as outfile:
         json.dump(cryptoData, outfile, indent=4)
