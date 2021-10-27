@@ -8,8 +8,8 @@ def start_test():
   print(get_availabel_pairs())
 
   print("=== Check Pairs ===")
-  print(check_pairs('btcusdt'))
-  print(check_pairs('btcthb'))
+  print(check_pairs('btcusdt') is not None)
+  print(check_pairs('btcthb') is None)
 
   print("=== Add Pairs ===")
   print(add_pairs('btcusdt'))
