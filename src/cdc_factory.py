@@ -126,6 +126,10 @@ def save_pairs():
     json.dump({'pairs':allPairs}, outfile, indent=4)
     outfile.close()
 
+def save_crypto_data():
+  with open(os.path.join(os.getcwd(), "src", "crypto-data.json"), "w") as outfile:
+      json.dump(cryptoData, outfile, indent=4)
+      outfile.close()
 
 def refetch():
     print("Refetching...")
@@ -140,9 +144,7 @@ def refetch():
     t2 = time.time()
     print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
 
-    with open(os.path.join(os.getcwd(), "src", "crypto-data.json"), "w") as outfile:
-        json.dump(cryptoData, outfile, indent=4)
-        outfile.close()
+    save_crypto_data()
 
 def init():
     global allPairs, cryptoData
