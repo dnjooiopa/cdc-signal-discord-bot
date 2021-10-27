@@ -9,9 +9,29 @@ init()
 from discord.ext import commands
 bot = commands.Bot(command_prefix='!cdc')
 
+
+def runThread():
+    # This function runs periodically every 1 second
+    threading.Timer(1, runThread).start()
+
+    now = datetime.now()
+    current_hour_minute = now.strftime("%H:%M")
+    current_time = now.strftime("%H:%M:%S")
+    current_date = now.strftime("%Y:%m%:%d")
+    #if current_hour_minute == "00:00":
+    print("\rCurrent Time =", current_time)
+
+    if(current_time == '00:00:24'): 
+        refetch()
+        print(f'Sending... update for {current_date}')
+        channel = bot.get_channel(CRYPTO_CHANNEL)
+        msg = get_all_signals(0)
+        channel.send(msg)
+
 @bot.event
 async def on_ready():
   print("Bot Started!")
+  runThread()
 
 @bot.event
 async def on_message(message):
@@ -35,20 +55,3 @@ async def on_message(message):
       msg = get_all_signals(0)
     await message.channel.send(msg)
 
-def runThread():
-    # This function runs periodically every 1 second
-    threading.Timer(1, runThread).start()
-
-    now = datetime.now()
-
-    current_hour_minute = now.strftime("%H:%M")
-    current_time = now.strftime("%H:%M:%S")
-    if current_hour_minute == "00:00":
-      print("\rCurrent Time =", current_time)
-
-    if(current_time == '00:00:30'):  # check if matches with the desired time
-        channel = bot.get_channel(CRYPTO_CHANNEL)
-        refetch()
-        msg = get_all_signals(0)
-        channel.send(msg)
-runThread()
