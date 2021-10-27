@@ -1,4 +1,3 @@
-from src.cdc_signal_bot import bot
-from config import BOT_TOKEN
+from src.cdc_signal_bot import start
 
-bot.run(BOT_TOKEN)
+start()
