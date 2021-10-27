@@ -111,6 +111,8 @@ def get_history_signal(period, pairs, backwardDays=365):
 allPairs = []
 
 def refetch():
+    print("Refetching...")
+    t1 = time.time()
     for tf in periods:
         for pairs in allPairs:
             if pairs in cryptoData[tf]:
@@ -118,6 +120,8 @@ def refetch():
                     fetch_crypto_pairs(pairs)
             else:
                 fetch_crypto_pairs(pairs)
+    t2 = time.time()
+    print(f'Successfully fetched : f{t2 - t1} seconds')
 
     with open(os.path.join(os.getcwd(), "src", "crypto-data.json"), "w") as outfile:
         json.dump(cryptoData, outfile, indent=4)
