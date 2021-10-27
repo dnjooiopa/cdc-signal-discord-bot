@@ -25,6 +25,13 @@ cryptoData = {
     '86400': {}
 }
 
+allPairs = []
+
+TF_NAME = {
+  '86400': '1 day',
+  '43200': '12 hours'
+}
+
 def get_format_time(unix):
     return datetime.utcfromtimestamp(unix).strftime('%Y %m %d')
 
@@ -82,45 +89,6 @@ def fetch_crypto_pairs(pairs):
     }
     print(f'Successfully fetched : {pairs.upper()} with tf {period}')
 
-
-def get_signal(period, pairs, dayOffSet=0):
-    currentIdx = dayOffSet-2
-    previousIdx = dayOffSet-3
-
-    isBuySignal = cryptoData[period][pairs]['ema12'][currentIdx] > cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] < cryptoData[period][pairs]['ema26'][previousIdx]
-    isSellSignal = cryptoData[period][pairs]['ema12'][currentIdx] < cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] > cryptoData[period][pairs]['ema26'][previousIdx]
-    
-    timestamp = cryptoData[period][pairs]['timestamps'][currentIdx]
-    closingPrice = cryptoData[period][pairs]['closing_prices'][currentIdx]
-
-    if isBuySignal:
-        return (True, False, False, timestamp, closingPrice)
-    elif isSellSignal:
-        return (False, True, False, timestamp, closingPrice)
-    else:
-        return (False, False, True, timestamp, closingPrice)
-
-def get_history_signal(period, pairs, backwardDays=365):
-  availableDays = len(cryptoData[period][pairs]['timestamps'])
-  if backwardDays > availableDays:
-    backwardDays = availableDays
-
-  signals = {'buys':{'timestamps':[], 'closing_prices':[]}, 'sells':{'timestamps':[], 'closing_prices':[]}}
-  
-  for i in range(availableDays - backwardDays + 1, availableDays):
-    (isBuy, isSell, noSignal, timstamp, closingPrice) = get_signal(period, pairs, -backwardDays+3+i)
-    if isBuy:
-      signals['buys']['timestamps'].append(timstamp)
-      signals['buys']['closing_prices'].append(closingPrice)
-    elif isSell:
-      signals['sells']['timestamps'].append(timstamp)
-      signals['sells']['closing_prices'].append(closingPrice)
-
-  return signals
-
-
-allPairs = []
-
 def save_pairs():
   with open(os.path.join(os.getcwd(), "src", "crypto-info.json"), "w") as outfile:
     json.dump({'pairs':allPairs}, outfile, indent=4)
@@ -162,6 +130,23 @@ def init():
 
     refetch()
 
+def get_signal(period, pairs, dayOffSet=0):
+    currentIdx = dayOffSet-2
+    previousIdx = dayOffSet-3
+
+    isBuySignal = cryptoData[period][pairs]['ema12'][currentIdx] > cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] < cryptoData[period][pairs]['ema26'][previousIdx]
+    isSellSignal = cryptoData[period][pairs]['ema12'][currentIdx] < cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] > cryptoData[period][pairs]['ema26'][previousIdx]
+    
+    timestamp = cryptoData[period][pairs]['timestamps'][currentIdx]
+    closingPrice = cryptoData[period][pairs]['closing_prices'][currentIdx]
+
+    if isBuySignal:
+        return (True, False, False, timestamp, closingPrice)
+    elif isSellSignal:
+        return (False, True, False, timestamp, closingPrice)
+    else:
+        return (False, False, True, timestamp, closingPrice)
+
 def get_signal_with_pairs(tf, pairs, dayOffset):
     (buy, sell, noSignal, timestamp, closingPrice) = get_signal(tf, pairs, dayOffset)
     formatTime = get_format_time(timestamp)
@@ -174,11 +159,7 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
     return msg
 
 def get_signals_with_tf(tf, dayOffset):
-    tfName = '📈 Time frame 1 day'
-    if tf == '43200':
-        tfName = '📈 Time frame 12 hours'
-
-    msg = f'\n{tfName}'
+    msg = f'\n📈 Time frame{TF_NAME[tf]}'
 
     for pairs in allPairs:
         signalMsg = get_signal_with_pairs(tf, pairs, dayOffset)
@@ -186,6 +167,22 @@ def get_signals_with_tf(tf, dayOffset):
     if 'BUY' not in msg and 'SELL' not in msg:
         msg += '\nNo signal'
     return msg
+
+def get_historical_signal(pairs):
+  if pairs not in allPairs:
+    return ''
+
+  msg = ''
+  for tf in periods:
+    backwardDays=1000
+    availableDays = len(cryptoData[tf][pairs]['timestamps'])
+    if backwardDays > availableDays:
+      backwardDays = availableDays
+
+    msg += f'\n📈 Historical signal for time frame {TF_NAME[tf]} (last {days} days)'
+    for i in range(availableDays - backwardDays + 1, availableDays):
+      msg += get_signal_with_pairs(tf, pairs, -backwardDays+2+i)
+  return msg
 
 def get_all_signals(dayOffset):
     msg = ''
@@ -220,4 +217,3 @@ def add_pairs(pairs):
     save_pairs()
     msg = f'✅ Pairs added : {pairs.upper()}'
   return msg
-  
