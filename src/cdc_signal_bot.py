@@ -30,7 +30,7 @@ def runThread():
         refetch()
         print(f'Sending... update for {current_date}')
         channel = bot.get_channel(int(CRYPTO_CHANNEL))
-        msg = get_signals_with_tf(0)
+        msg = get_signals_with_tf('43200', 0)
         channel.send(msg)
 
 @bot.event
