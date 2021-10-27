@@ -15,16 +15,15 @@ def runThread():
     threading.Timer(1, runThread).start()
 
     now = datetime.now()
-    current_hour_minute = now.strftime("%H:%M")
+
     current_time = now.strftime("%H:%M:%S")
     current_date = now.strftime("%Y:%m%:%d")
-    #if current_hour_minute == "00:00":
-    print("\rCurrent Time =", current_time)
 
+    print("\rCurrent Time =", current_time)
     if(current_time == '00:00:24'): 
         refetch()
         print(f'Sending... update for {current_date}')
-        channel = bot.get_channel(CRYPTO_CHANNEL)
+        channel = bot.get_channel(int(CRYPTO_CHANNEL))
         msg = get_all_signals(0)
         channel.send(msg)
 
