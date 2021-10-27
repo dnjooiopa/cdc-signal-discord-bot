@@ -1,4 +1,4 @@
-from discord.ext import commands, tasks
+from discord.ext import commands
 from datetime import datetime
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
