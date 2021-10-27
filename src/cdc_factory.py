@@ -39,18 +39,27 @@ def calculate_ema(prices, days, smoothing=2):
         ema.append((price * (smoothing / (1 + days))) + ema[-1] * (1 - (smoothing / (1 + days))))
     return ema
 
-def fetch_crypto_pairs(pairs):
-  global cryptoData
-  url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
+def make_request(url):
   sess = Session()
   response = sess.get(url, params=parameters)
   responseData = json.loads(response.text)
   if 'error' in responseData:
-    print('error:', pairs.upper())
     return None
+  return responseData['result']
+
+def fetch_crypto_pairs(pairs):
+  global cryptoData
+  
+  url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
 
   for period in periods:
-    data = responseData['result'][period]
+    result = make_request(url)
+
+    if result is None:
+      print(f'Error cannot fetch : {pairs.upper()}')
+      continue
+
+    data = result[period]
 
     if len(data) < 27:
       continue
@@ -178,6 +187,13 @@ def get_all_signals(dayOffset):
 
     return msg
 
-
 def get_availabel_pairs():
     return ','.join([x.upper() for x in allPairs])
+
+def check_pairs(pairs):
+    url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
+    result = make_request(url)
+    msg = f'❌ Pairs not found : {pairs.upper()}'
+    if result is not None:
+      msg = f'✅ Pairs added : {pairs.upper()}'
+    return msg
