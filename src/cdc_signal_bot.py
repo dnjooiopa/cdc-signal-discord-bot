@@ -11,7 +11,6 @@ bot = commands.Bot(command_prefix='!cdc')
 
 
 def runThread():
-    # This function runs periodically every 1 second
     threading.Timer(1, runThread).start()
 
     now = datetime.now()
@@ -44,12 +43,17 @@ async def on_message(message):
     print('contents')
     print(contents)
 
-    if len(contents) == 2:
+    dayOffset = 0
+
+    if len(contents) >= 3:
+      if contents[2] == 'future':
+        dayOffset = 1
+    if len(contents) >= 2:
       if contents[1] == 'signal':
-        msg = get_all_signals(0)
+        msg = get_all_signals(dayOffset)
       if contents[1] == 'update':
         refetch()
-        msg = get_all_signals(0)
+        msg = get_all_signals(dayOffset)
     else:
       msg = get_all_signals(0)
     await message.channel.send(msg)
