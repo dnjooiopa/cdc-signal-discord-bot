@@ -1,42 +1,40 @@
-from src.cdc_factory import init, refetch, get_signals_with_tf, get_all_signals
-from config import CRYPTO_CHANNEL
-
-import threading
+from discord.ext import commands, tasks
 from datetime import datetime
 
-init()
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
-from discord.ext import commands
+from src.cdc_factory import init, refetch, get_signals_with_tf, get_all_signals
+from config import CRYPTO_CHANNEL, BOT_TOKEN
+
 bot = commands.Bot(command_prefix='!cdc')
 
+async def send_update_signal():
+  now = datetime.now()
+  current_time = now.strftime("%H:%M")
+  current_date = now.strftime("%Y:%m:%d %H:%M:%S")
 
-def runThread():
-    threading.Timer(1, runThread).start()
-
-    now = datetime.now()
-
-    current_time = now.strftime("%H:%M:%S")
-    current_date = now.strftime("%Y:%m%:%d")
-
-    print("\rCurrent Time =", current_time)
-    if(current_time == '00:00:24'): 
-        refetch()
-        print(f'Sending... update for {current_date}')
-        channel = bot.get_channel(int(CRYPTO_CHANNEL))
-        msg = get_all_signals(0)
-        channel.send(msg)
-    
-    if current_time == '12:00:24':
-        refetch()
-        print(f'Sending... update for {current_date}')
-        channel = bot.get_channel(int(CRYPTO_CHANNEL))
-        msg = get_signals_with_tf('43200', 0)
-        channel.send(msg)
-
+  refetch()
+  print('Sending... update')
+  msg = f'\n✅ Authomatic update: {current_date}'
+  
+  if current_time == "00:00":
+    channel = bot.get_channel(int(CRYPTO_CHANNEL))
+    msg += get_all_signals(0)
+    await channel.send(msg)
+  else:
+    channel = bot.get_channel(int(CRYPTO_CHANNEL))
+    msg += get_signals_with_tf('43200', 0)
+    await channel.send(msg)
+  
 @bot.event
 async def on_ready():
   print("Bot Started!")
-  runThread()
+
+  scheduler = AsyncIOScheduler()
+  scheduler.add_job(send_update_signal, CronTrigger(hour="0, 12", minute="0", second="30"))
+
+  scheduler.start()
 
 @bot.event
 async def on_message(message):
@@ -51,17 +49,18 @@ async def on_message(message):
     print(contents)
 
     dayOffset = 0
-
-    if len(contents) >= 3:
-      if contents[2] == 'future':
-        dayOffset = 1
-    if len(contents) >= 2:
-      if contents[1] == 'signal':
-        msg = get_all_signals(dayOffset)
+  
+    if len(contents) == 2:
       if contents[1] == 'update':
         refetch()
-        msg = get_all_signals(dayOffset)
+      if contents[1] == 'future':
+        dayOffset = 1
+
+      msg = get_all_signals(dayOffset)
     else:
       msg = get_all_signals(0)
     await message.channel.send(msg)
 
+def start():
+  init()
+  bot.run(BOT_TOKEN)

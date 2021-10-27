@@ -1,3 +1,4 @@
 python-dotenv==0.19.1
 discord==1.7.3
 requests==2.26.0
+APScheduler==3.8.1
