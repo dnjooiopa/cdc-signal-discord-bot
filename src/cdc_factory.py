@@ -157,9 +157,9 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
     return msg
 
 def get_signals_with_tf(tf, dayOffset):
-    tfName = '✅ Time frame 1 day'
+    tfName = '📈 Time frame 1 day'
     if tf == '43200':
-        tfName = '✅ Time frame 12 hours'
+        tfName = '📈 Time frame 12 hours'
 
     msg = f'\n{tfName}'
 
