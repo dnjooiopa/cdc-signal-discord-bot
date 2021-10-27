@@ -170,7 +170,7 @@ def get_signals_with_tf(tf, dayOffset):
 
 def get_historical_signal(pairs):
   if pairs not in allPairs:
-    return ''
+    return f'❌ Pairs not exists : {pairs.upper()}'
 
   msg = ''
   for tf in periods:
@@ -179,7 +179,7 @@ def get_historical_signal(pairs):
     if backwardDays > availableDays:
       backwardDays = availableDays
 
-    msg += f'📈 Historical signal for time frame {TF_NAME[tf]} (last {days} days)'
+    msg += f'\n📈 Historical signal for time frame {TF_NAME[tf]} (last {days} days)'
     for i in range(availableDays - backwardDays + 1, availableDays):
       msg += get_signal_with_pairs(tf, pairs, -backwardDays+2+i)
   return msg
