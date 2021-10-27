@@ -80,6 +80,8 @@ def fetch_crypto_pairs(pairs):
         'ema26': ema26,
         'timestamps': timestamps
     }
+    print(f'Successfully fetched : {pairs.upper()} with tf {period}')
+
 
 def get_signal(period, pairs, dayOffSet=0):
     currentIdx = dayOffSet-2
@@ -119,6 +121,12 @@ def get_history_signal(period, pairs, backwardDays=365):
 
 allPairs = []
 
+def save_pairs():
+  with open(os.path.join(os.getcwd(), "src", "crypto-info.json"), "w") as outfile:
+    json.dump({'pairs':allPairs}, outfile, indent=4)
+    outfile.close()
+
+
 def refetch():
     print("Refetching...")
     t1 = time.time()
@@ -129,14 +137,12 @@ def refetch():
                     fetch_crypto_pairs(pairs)
             else:
                 fetch_crypto_pairs(pairs)
-            print(f'Successfully fetched : {pairs.upper()} with tf {tf}')
     t2 = time.time()
     print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
 
     with open(os.path.join(os.getcwd(), "src", "crypto-data.json"), "w") as outfile:
         json.dump(cryptoData, outfile, indent=4)
         outfile.close()
-
 
 def init():
     global allPairs, cryptoData
@@ -191,9 +197,23 @@ def get_availabel_pairs():
     return ','.join([x.upper() for x in allPairs])
 
 def check_pairs(pairs):
-    url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
-    result = make_request(url)
-    msg = f'❌ Pairs not found : {pairs.upper()}'
-    if result is not None:
-      msg = f'✅ Pairs added : {pairs.upper()}'
-    return msg
+  url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
+  result = make_request(url)
+  return result
+  # msg = f'❌ Pairs not found : {pairs.upper()}'
+  # if result is not None:
+  #   msg = f'✅ Pairs added : {pairs.upper()}'
+  # return msg
+
+def add_pairs(pairs): 
+  if pairs in allPairs:
+    return  f'✅ Pairs already exists: {pairs.upper()}'
+
+  msg = f'❌ Pairs not found : {pairs.upper()}'
+  if check_pairs(pairs) is not None:
+    allPairs.append(pairs)
+    refetch()
+    save_pairs()
+    msg = f'✅ Pairs added : {pairs.upper()}'
+  return msg
+  
