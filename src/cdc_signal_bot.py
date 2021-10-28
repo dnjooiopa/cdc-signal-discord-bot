@@ -49,7 +49,9 @@ async def on_message(message):
     print(contents)
 
     dayOffset = 0
-  
+
+    if len(contents) == 1:
+      msg = get_all_signals(0)
     if len(contents) == 2:
       if contents[1] == 'update':
         refetch()
@@ -68,8 +70,7 @@ async def on_message(message):
         msg = add_pairs(contents[2])
       elif contents[1] == 'check':
         msg = check_if_pairs_exists(contents[2])
-    else:
-      msg = get_all_signals(0)
+
     await message.channel.send(msg)
 
 def start():
