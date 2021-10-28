@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from src.cdc_factory import add_pairs, check_if_pairs_exists, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals
-from config import CRYPTO_CHANNEL, BOT_TOKEN
+from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE
 
 bot = commands.Bot(command_prefix='!cdc')
 
@@ -42,7 +42,7 @@ async def on_message(message):
   print(message)
 
   msgContent = message.content
-  msg = 'พิมพ์ให้ถูกดิ๊ ควย!!!'
+  msg = UNKNOWN_MESSAGE
   if msgContent.startswith('!cdc') :
     contents = msgContent.split(' ')
     print('contents')
@@ -51,7 +51,8 @@ async def on_message(message):
     dayOffset = 0
 
     if len(contents) == 1:
-      msg = 'For more info ```!cdc info```'
+      msg = WELCOME_MESSAGE
+      msg += '\nFor more info ```!cdc info```'
       msg += get_all_signals(0)
     if len(contents) == 2:
       if contents[1] == 'update':
