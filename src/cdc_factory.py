@@ -123,12 +123,12 @@ def init():
     print("Application starting...")
 
     if not file_exists("crypto-info.json"):
-      allPairs = open_file('crypto-info.default.json', directory='src')['pairs']
+      allPairs = open_file('crypto-info.default.json', directory='default')['pairs']
     else:
       allPairs = open_file('crypto-info.json')['pairs']
     
     if not file_exists("crypto-data.json"):
-      cryptoData = open_file('crypto-data.default.json', directory='src')
+      cryptoData = open_file('crypto-data.default.json', directory='default')
     else:
       cryptoData = open_file('crypto-data.json')
 
