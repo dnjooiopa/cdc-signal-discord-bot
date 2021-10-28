@@ -197,7 +197,9 @@ def get_all_signals(dayOffset):
     return msg
 
 def get_availabel_pairs():
-    return ','.join([x.upper() for x in allPairs])
+  msg = ','.join([x.upper() for x in allPairs])
+  msg += f'\n🟢 Pairs Availabel : {len(allPairs)}'
+  return msg
 
 def check_pairs(pairs):
   url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
