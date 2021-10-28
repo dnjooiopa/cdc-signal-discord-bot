@@ -90,12 +90,12 @@ def fetch_crypto_pairs(pairs):
     print(f'Successfully fetched : {pairs.upper()} with tf {period}')
 
 def save_pairs():
-  with open(os.path.join(os.getcwd(), "src", "crypto-info.json"), "w") as outfile:
+  with open(os.path.join(os.getcwd(), "data", "crypto-info.json"), "w") as outfile:
     json.dump({'pairs':allPairs}, outfile, indent=4)
     outfile.close()
 
 def save_crypto_data():
-  with open(os.path.join(os.getcwd(), "src", "crypto-data.json"), "w") as outfile:
+  with open(os.path.join(os.getcwd(), "data", "crypto-data.json"), "w") as outfile:
       json.dump(cryptoData, outfile, indent=4)
       outfile.close()
 
@@ -118,12 +118,12 @@ def init():
     global allPairs, cryptoData
     print("Application starting...")
 
-    with open(os.path.join(os.getcwd(), "src", "crypto-info.json")) as cryptoInfoFile:
+    with open(os.path.join(os.getcwd(), "data", "crypto-info.json")) as cryptoInfoFile:
         data = json.load(cryptoInfoFile)
         allPairs = data['pairs']
         cryptoInfoFile.close()
 
-    with open(os.path.join(os.getcwd(), "src", "crypto-data.json")) as cryptoDataFile:
+    with open(os.path.join(os.getcwd(), "data", "crypto-data.json")) as cryptoDataFile:
         data = json.load(cryptoDataFile)
         cryptoData = data
         cryptoDataFile.close()
