@@ -4,7 +4,7 @@ from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from src.cdc_factory import add_pairs, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals
+from src.cdc_factory import add_pairs, check_if_pairs_exists, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals
 from config import CRYPTO_CHANNEL, BOT_TOKEN
 
 bot = commands.Bot(command_prefix='!cdc')
@@ -62,8 +62,10 @@ async def on_message(message):
     elif len(contents) == 3:
       if contents[1] == 'history':
         msg = get_historical_signal(contents[2])
-      if contents[1] == 'add':
+      elif contents[1] == 'add':
         msg = add_pairs(contents[2])
+      elif contents[1] == 'check':
+        msg = check_if_pairs_exists(contents[2])
     else:
       msg = get_all_signals(0)
     await message.channel.send(msg)

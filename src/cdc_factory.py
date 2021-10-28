@@ -204,7 +204,7 @@ def check_if_pairs_exists(pairs):
   if pairs in allPairs:
     return f'✅ Pairs already exists : {pairs.upper()}'
   else:
-    return f'❌ Pairs does not exists : {pairs.upper()}'
+    return f'❌ Pairs does not exists : {pairs.upper()}\nType "!cdc add pair {pairs}" to add this pairs.'
 
 def add_pairs(pairs): 
   if pairs in allPairs:
