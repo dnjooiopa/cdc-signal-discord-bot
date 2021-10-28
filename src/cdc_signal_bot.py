@@ -67,11 +67,11 @@ async def on_message(message):
         msg = 'รอก่อน กำลังทำ...'
     elif len(contents) == 3:
       if contents[1] == 'history':
-        msg = get_historical_signal(contents[2])
+        msg = get_historical_signal(contents[2].lower())
       elif contents[1] == 'add':
-        msg = add_pairs(contents[2])
+        msg = add_pairs(contents[2].lower())
       elif contents[1] == 'check':
-        msg = check_if_pairs_exists(contents[2])
+        msg = check_if_pairs_exists(contents[2].lower())
 
     await message.channel.send(msg)
 
