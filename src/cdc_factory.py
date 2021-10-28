@@ -3,6 +3,7 @@ import time
 from requests import Session
 import os
 import json
+import matplotlib.pyplot as plt
 
 from config import API_KEY
 
@@ -59,14 +60,14 @@ def fetch_crypto_pairs(pairs):
   
   url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
 
-  for period in periods:
+  for tf in periods:
     result = make_request(url)
 
     if result is None:
       print(f'Error cannot fetch : {pairs.upper()}')
       continue
 
-    data = result[period]
+    data = result[tf]
 
     if len(data) < 27:
       continue
@@ -81,13 +82,16 @@ def fetch_crypto_pairs(pairs):
     timestamps = timestamps[25:]
     closingPrices = closingPrices[25:]
 
-    cryptoData[period][pairs] = {
+   
+    cryptoData[tf][pairs] = {
         'closing_prices': closingPrices,
         'ema12': ema12,
         'ema26': ema26,
         'timestamps': timestamps
     }
-    print(f'Successfully fetched : {pairs.upper()} with tf {period}')
+    cryptoData[tf][pairs]['signals'] = get_historical_signal_data(tf, pairs)
+
+    print(f'Successfully fetched : {pairs.upper()} with tf {tf}')
 
 def save_file(fileName, data):
   with open(os.path.join(os.getcwd(), "data", fileName), "w") as outfile:
@@ -117,22 +121,6 @@ def refetch():
     t2 = time.time()
     save_file('crypto-data.json', cryptoData)
     print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
-    
-def init():
-    global allPairs, cryptoData
-    print("Application starting...")
-
-    if not file_exists("crypto-info.json"):
-      allPairs = open_file('crypto-info.default.json', directory='default')['pairs']
-    else:
-      allPairs = open_file('crypto-info.json')['pairs']
-    
-    if not file_exists("crypto-data.json"):
-      cryptoData = open_file('crypto-data.default.json', directory='default')
-    else:
-      cryptoData = open_file('crypto-data.json')
-
-    refetch()
 
 def get_signal(period, pairs, dayOffSet=0):
     currentIdx = dayOffSet-2
@@ -188,6 +176,21 @@ def get_historical_signal(pairs):
       msg += get_signal_with_pairs(tf, pairs, -backwardDays+2+i)
   return msg
 
+def get_historical_signal_data(tf, pairs):
+  availableDays = len(cryptoData[tf][pairs]['timestamps'])
+
+  signals = {'buys': {'closing_prices': [], 'timestamps': []}, 'sells': {'closing_prices': [], 'timestamps': []}}
+  for i in range(1, availableDays):
+    (buy, sell, noSignal, timestamp, closingPrice) = get_signal(tf, pairs, -availableDays+2+i)
+    if buy:
+      signals['buys']['closing_prices'].append(closingPrice)
+      signals['buys']['timestamps'].append(timestamp)
+    elif sell:
+      signals['sells']['closing_prices'].append(closingPrice)
+      signals['sells']['timestamps'].append(timestamp)
+
+  return signals
+
 def get_all_signals(dayOffset):
     msg = ''
     for tf in periods:
@@ -223,3 +226,68 @@ def add_pairs(pairs):
     save_file('crypto-info.json', {"pairs": allPairs})
     msg = f'✅ Pairs added : {pairs.upper()}'
   return msg
+
+
+def save_graph(pairs, tf):
+  plt.xlabel('Days')
+  plt.ylabel('Prices')
+
+  x_axis =  cryptoData[tf][pairs]['timestamps']
+  plt.title(pairs.upper(), fontsize=20)
+
+  plt.xticks(rotation=90)
+
+  plt.plot(x_axis, cryptoData[tf][pairs]['closing_prices'], label='closing prices', color='cornflowerblue')
+  plt.plot(x_axis, cryptoData[tf][pairs]['ema12'], label='EMA12', color='gold')
+  plt.plot(x_axis, cryptoData[tf][pairs]['ema26'], label='EMA26', color='plum')
+
+  buySignals = cryptoData[tf][pairs]['signals']['buys']
+  sellSignals = cryptoData[tf][pairs]['signals']['sells']
+
+  plt.scatter(buySignals['timestamps'], buySignals['closing_prices'], s=100, color='green')
+  plt.scatter(sellSignals['timestamps'], sellSignals['closing_prices'], s=100, color='red')
+
+  for i, txt in enumerate(buySignals['closing_prices']):
+    formatTime = get_format_time(buySignals['timestamps'][i])
+    label = f'   {formatTime}'
+    label += f'\n   BUY at: {txt}$'
+    plt.annotate(label, (buySignals['timestamps'][i], buySignals['closing_prices'][i]))
+
+  for i, txt in enumerate(sellSignals['closing_prices']):
+    formatTime = get_format_time(sellSignals['timestamps'][i])
+    label = f'   {formatTime}'
+    label += f'\n   SELL at: {txt}$'
+    plt.annotate(label, (sellSignals['timestamps'][i], sellSignals['closing_prices'][i]), color='red')
+
+  plt.savefig(os.path.join(os.getcwd(), "data", 'graph.png'))
+  plt.close()
+
+def generate_graph(pairs, tf='86400'):
+    msg = None
+    if pairs not in allPairs:
+      msg = f'❌ Pairs does not exists : {pairs.upper()}' 
+    else:
+      save_graph(pairs, tf)
+    return msg
+  
+def init():
+    global allPairs, cryptoData
+    print("Application starting...")
+
+    if not file_exists("crypto-info.json"):
+      allPairs = open_file('crypto-info.default.json', directory='default')['pairs']
+    else:
+      allPairs = open_file('crypto-info.json')['pairs']
+    
+    if not file_exists("crypto-data.json"):
+      cryptoData = open_file('crypto-data.default.json', directory='default')
+    else:
+      cryptoData = open_file('crypto-data.json')
+
+    refetch()
+
+    plt.rcParams['figure.figsize'] = [20, 12]
+    plt.rcParams["figure.autolayout"] = True
+    plt.plot([1,2,3], [1,2,3])
+    plt.savefig(os.path.join(os.getcwd(), "data", 'graph.png'))
+    plt.close()
