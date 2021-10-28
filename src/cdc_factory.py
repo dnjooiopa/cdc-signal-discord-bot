@@ -89,15 +89,20 @@ def fetch_crypto_pairs(pairs):
     }
     print(f'Successfully fetched : {pairs.upper()} with tf {period}')
 
-def save_pairs():
-  with open(os.path.join(os.getcwd(), "data", "crypto-info.json"), "w") as outfile:
-    json.dump({'pairs':allPairs}, outfile, indent=4)
+def save_file(fileName, data):
+  with open(os.path.join(os.getcwd(), "data", fileName), "w") as outfile:
+    json.dump(data, outfile, indent=4)
     outfile.close()
+    print(f'{fileName} has been saved.')
 
-def save_crypto_data():
-  with open(os.path.join(os.getcwd(), "data", "crypto-data.json"), "w") as outfile:
-      json.dump(cryptoData, outfile, indent=4)
-      outfile.close()
+def open_file(fileName, directory='data'):
+  with open(os.path.join(os.getcwd(), directory, fileName)) as openfile:
+    data = json.load(openfile)
+    openfile.close()
+    return data
+
+def file_exists(fileName, directory='data'):
+  return os.path.exists(os.path.join(os.getcwd(), directory, fileName))
 
 def refetch():
     print("Refetching...")
@@ -110,23 +115,22 @@ def refetch():
             else:
                 fetch_crypto_pairs(pairs)
     t2 = time.time()
+    save_file('crypto-data.json', cryptoData)
     print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
-
-    save_crypto_data()
-
+    
 def init():
     global allPairs, cryptoData
     print("Application starting...")
 
-    with open(os.path.join(os.getcwd(), "data", "crypto-info.json")) as cryptoInfoFile:
-        data = json.load(cryptoInfoFile)
-        allPairs = data['pairs']
-        cryptoInfoFile.close()
-
-    with open(os.path.join(os.getcwd(), "data", "crypto-data.json")) as cryptoDataFile:
-        data = json.load(cryptoDataFile)
-        cryptoData = data
-        cryptoDataFile.close()
+    if not file_exists("crypto-info.json"):
+      allPairs = open_file('crypto-info.default.json', directory='src')['pairs']
+    else:
+      allPairs = open_file('crypto-info.json')['pairs']
+    
+    if not file_exists("crypto-data.json"):
+      cryptoData = open_file('crypto-data.default.json', directory='src')
+    else:
+      cryptoData = open_file('crypto-data.json')
 
     refetch()
 
@@ -214,6 +218,6 @@ def add_pairs(pairs):
   if check_pairs(pairs) is not None:
     allPairs.append(pairs)
     refetch()
-    save_pairs()
+    save_file('crypto-info.json', {"pairs": allPairs})
     msg = f'✅ Pairs added : {pairs.upper()}'
   return msg
