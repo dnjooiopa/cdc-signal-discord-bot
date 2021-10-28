@@ -42,7 +42,7 @@ async def on_message(message):
   print(message)
 
   msgContent = message.content
-  msg = UNKNOWN_MESSAGE
+  msg = f'{UNKNOWN_MESSAGE}'
   if msgContent.startswith('!cdc') :
     contents = msgContent.split(' ')
     print('contents')
@@ -51,8 +51,8 @@ async def on_message(message):
     dayOffset = 0
 
     if len(contents) == 1:
-      msg = WELCOME_MESSAGE
-      msg += '\nFor more info ```!cdc info```'
+      msg = f'🚀🚀 {WELCOME_MESSAGE}'
+      msg += '\nFor more infomation ```!cdc info```'
       msg += get_all_signals(0)
     if len(contents) == 2:
       if contents[1] == 'update':
