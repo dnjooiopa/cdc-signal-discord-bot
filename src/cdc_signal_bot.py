@@ -51,8 +51,8 @@ async def on_message(message):
     dayOffset = 0
 
     if len(contents) == 1:
-      msg = f'🚀🚀 {WELCOME_MESSAGE}'
-      msg += '\nFor more infomation ```!cdc info```'
+      msg = f'🚷 {WELCOME_MESSAGE} 🚀🚀'
+      msg += '\n\nUse command below for more information.```!cdc info```'
       msg += get_all_signals(0)
     if len(contents) == 2:
       if contents[1] == 'update':
