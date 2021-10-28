@@ -139,3 +139,4 @@ cython_debug/
 
 crypto-info.json
 crypto-data.json
+*.png
