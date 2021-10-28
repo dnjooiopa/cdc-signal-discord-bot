@@ -201,7 +201,7 @@ def get_all_signals(dayOffset):
 
 def get_availabel_pairs():
   msg = ','.join([x.upper() for x in allPairs])
-  msg += f'\n🟢 Pairs Availabel : {len(allPairs)}'
+  msg += f'\nPairs Availabel : {len(allPairs)}'
   return msg
 
 def check_pairs(pairs):
