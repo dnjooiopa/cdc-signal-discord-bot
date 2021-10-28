@@ -174,7 +174,7 @@ def get_signals_with_tf(tf, dayOffset):
 
 def get_historical_signal(pairs):
   if pairs not in allPairs:
-    return f'❌ Pairs not exists : {pairs.upper()}\nType "!cdc add {pairs}" to add this pairs.'
+    return f'❌ Pairs not exists : {pairs.upper()}\nUse this command ```!cdc add {pairs}``` to add new pairs.'
 
   msg = ''
   for tf in periods:

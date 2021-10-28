@@ -51,7 +51,8 @@ async def on_message(message):
     dayOffset = 0
 
     if len(contents) == 1:
-      msg = get_all_signals(0)
+      msg = 'For more info ```!cdc info```'
+      msg += get_all_signals(0)
     if len(contents) == 2:
       if contents[1] == 'update':
         refetch()
