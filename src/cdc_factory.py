@@ -159,7 +159,7 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
     return msg
 
 def get_signals_with_tf(tf, dayOffset):
-    msg = f'\n📈 Time frame{TF_NAME[tf]}'
+    msg = f'\n📈 Time frame {TF_NAME[tf]}'
 
     for pairs in allPairs:
         signalMsg = get_signal_with_pairs(tf, pairs, dayOffset)
@@ -170,7 +170,7 @@ def get_signals_with_tf(tf, dayOffset):
 
 def get_historical_signal(pairs):
   if pairs not in allPairs:
-    return f'❌ Pairs not exists : {pairs.upper()}'
+    return f'❌ Pairs not exists : {pairs.upper()}\nType "!cdc add pair {pairs}" to add this pairs.'
 
   msg = ''
   for tf in periods:
@@ -208,9 +208,9 @@ def check_if_pairs_exists(pairs):
 
 def add_pairs(pairs): 
   if pairs in allPairs:
-    return  f'✅ Pairs already exists: {pairs.upper()}'
+    return  f'✅ Pairs already exists : {pairs.upper()}'
 
-  msg = f'❌ Pairs not found : {pairs.upper()}'
+  msg = f'❌ Pairs not found in Binance : {pairs.upper()}'
   if check_pairs(pairs) is not None:
     allPairs.append(pairs)
     refetch()
