@@ -14,7 +14,7 @@ bot = commands.Bot(command_prefix='!cdc')
 async def send_update_signal():
   now = datetime.now()
   current_time = now.strftime("%H:%M")
-  current_date = now.strftime("%Y:%m:%d %H:%M:%S")
+  current_date = now.strftime("%Y:%m:%dT%H:%M:%S")
 
   refetch()
   print('Sending... update')
@@ -94,7 +94,7 @@ async def on_message(message):
         msg = 'รอก่อน กำลังทำ...'
       elif cmds[1] == 'checktime':
         now = datetime.now()
-        msg = now.strftime('%Y:%m:%d %H:%M:%S')
+        msg = now.strftime('%Y:%m:%dT%H:%M:%S')
       elif cmds[1] == 'history' and cmds[2] is not None: # 3
         msg = get_historical_signal(cmds[2].lower())
       elif cmds[1] == 'add' and cmds[2] is not None:
