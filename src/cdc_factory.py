@@ -204,8 +204,8 @@ def get_historical_signal_data(tf, pairs):
 def get_all_signals(dayOffset):
     msg = ''
     for tf in periods:
-        signalMsg = get_signals_with_tf(tf, dayOffset)
-        msg += signalMsg
+      signalMsg = get_signals_with_tf(tf, dayOffset)
+      msg += signalMsg
 
     return msg
 
