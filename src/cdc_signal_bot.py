@@ -7,7 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from src.cdc_factory import add_pairs, check_if_pairs_exists, generate_graph, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals
-from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE
+from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, HOUR, MINUTE, SECOND
 
 bot = commands.Bot(command_prefix='!cdc')
 
@@ -54,7 +54,7 @@ async def on_ready():
   print("Bot Started!")
 
   scheduler = AsyncIOScheduler()
-  scheduler.add_job(send_update_signal, CronTrigger(hour="0,12", minute="0", second="30"))
+  scheduler.add_job(send_update_signal, CronTrigger(hour=HOUR, minute=MINUTE, second=SECOND))
 
   scheduler.start()
 

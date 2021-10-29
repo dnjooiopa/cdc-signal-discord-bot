@@ -9,3 +9,7 @@ CRYPTO_CHANNEL = os.getenv('CRYPTO_CHANNEL')
 
 UNKNOWN_MESSAGE = os.getenv('UNKNOWN_MESSAGE')
 WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE')
+
+HOUR = os.getenv('HOUR')
+MINUTE = os.getenv('MINUTE')
+SECOND = os.getenv('SECOND')
