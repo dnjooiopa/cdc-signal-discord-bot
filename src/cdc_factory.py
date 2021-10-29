@@ -36,18 +36,18 @@ TF_NAME = {
 }
 
 def get_format_time(unix):
-    return datetime.utcfromtimestamp(unix).strftime('%Y %m %d')
+  return datetime.utcfromtimestamp(unix).strftime('%Y %m %d')
 
 def get_current_timstamp():
-    current_unix_time = int(time.time())
-    parameters['after'] = current_unix_time - (86400*days)
-    return current_unix_time
+  current_unix_time = int(time.time())
+  parameters['after'] = current_unix_time - (86400*days)
+  return current_unix_time
 
 def calculate_ema(prices, days, smoothing=2):
-    ema = [sum(prices[:days]) / days]
-    for price in prices[days:]:
-        ema.append((price * (smoothing / (1 + days))) + ema[-1] * (1 - (smoothing / (1 + days))))
-    return ema
+  ema = [sum(prices[:days]) / days]
+  for price in prices[days:]:
+      ema.append((price * (smoothing / (1 + days))) + ema[-1] * (1 - (smoothing / (1 + days))))
+  return ema
 
 def make_request(url):
   sess = Session()
@@ -66,8 +66,8 @@ def fetch_crypto_pairs(pairs):
     for ex in exchanges:
       url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
       result = make_request(url)
-      exName = ex
       if result is not None:
+        exName = ex
         break
 
     if result is None:
@@ -117,46 +117,46 @@ def file_exists(fileName, directory='data'):
   return os.path.exists(os.path.join(os.getcwd(), directory, fileName))
 
 def refetch():
-    print("Refetching...")
-    t1 = time.time()
-    for tf in periods:
-        for pairs in allPairs:
-            if pairs in cryptoData[tf]:
-                if int(time.time()) > cryptoData[tf][pairs]['timestamps'][-1]:
-                    fetch_crypto_pairs(pairs)
-            else:
-                fetch_crypto_pairs(pairs)
-    t2 = time.time()
-    save_file('crypto-data.json', cryptoData)
-    print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
+  print("Refetching...")
+  t1 = time.time()
+  for tf in periods:
+      for pairs in allPairs:
+          if pairs in cryptoData[tf]:
+              if int(time.time()) > cryptoData[tf][pairs]['timestamps'][-1]:
+                  fetch_crypto_pairs(pairs)
+          else:
+              fetch_crypto_pairs(pairs)
+  t2 = time.time()
+  save_file('crypto-data.json', cryptoData)
+  print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
 
 def get_signal(period, pairs, dayOffSet=0):
-    currentIdx = dayOffSet-2
-    previousIdx = dayOffSet-3
+  currentIdx = dayOffSet-2
+  previousIdx = dayOffSet-3
 
-    isBuySignal = cryptoData[period][pairs]['ema12'][currentIdx] > cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] < cryptoData[period][pairs]['ema26'][previousIdx]
-    isSellSignal = cryptoData[period][pairs]['ema12'][currentIdx] < cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] > cryptoData[period][pairs]['ema26'][previousIdx]
-    
-    timestamp = cryptoData[period][pairs]['timestamps'][currentIdx]
-    closingPrice = cryptoData[period][pairs]['closing_prices'][currentIdx]
+  isBuySignal = cryptoData[period][pairs]['ema12'][currentIdx] > cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] < cryptoData[period][pairs]['ema26'][previousIdx]
+  isSellSignal = cryptoData[period][pairs]['ema12'][currentIdx] < cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] > cryptoData[period][pairs]['ema26'][previousIdx]
+  
+  timestamp = cryptoData[period][pairs]['timestamps'][currentIdx]
+  closingPrice = cryptoData[period][pairs]['closing_prices'][currentIdx]
 
-    if isBuySignal:
-        return (True, False, False, timestamp, closingPrice)
-    elif isSellSignal:
-        return (False, True, False, timestamp, closingPrice)
-    else:
-        return (False, False, True, timestamp, closingPrice)
+  if isBuySignal:
+      return (True, False, False, timestamp, closingPrice)
+  elif isSellSignal:
+      return (False, True, False, timestamp, closingPrice)
+  else:
+      return (False, False, True, timestamp, closingPrice)
 
 def get_signal_with_pairs(tf, pairs, dayOffset):
-    (buy, sell, noSignal, timestamp, closingPrice) = get_signal(tf, pairs, dayOffset)
-    formatTime = get_format_time(timestamp)
-    msg = ''
-    if buy:
-        msg = f'\n{formatTime} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
-    elif sell:
-        msg = f'\n{formatTime} : {pairs.upper()} : SELL 🔴 at {closingPrice}$'
+  (buy, sell, noSignal, timestamp, closingPrice) = get_signal(tf, pairs, dayOffset)
+  formatTime = get_format_time(timestamp)
+  msg = ''
+  if buy:
+      msg = f'\n{formatTime} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
+  elif sell:
+      msg = f'\n{formatTime} : {pairs.upper()} : SELL 🔴 at {closingPrice}$'
 
-    return msg
+  return msg
 
 def get_signals_with_tf(tf, dayOffset):
     msg = f'\n📈 Time frame {TF_NAME[tf]}'
@@ -169,6 +169,7 @@ def get_signals_with_tf(tf, dayOffset):
     return msg
 
 def get_historical_signal(pairs):
+  print(pairs not in allPairs)
   if pairs not in allPairs:
     return f'❌ Pairs not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
 
@@ -216,10 +217,10 @@ def check_pairs(pairs):
   result = None
   exName = None
   for ex in exchanges:
-    exName = ex
     url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
     result = make_request(url)
     if result is not None:
+      exName = ex
       break
   return result, exName
 
@@ -234,13 +235,14 @@ def add_pairs(pairs):
     return  f'✅ Pairs already exists : {pairs.upper()}'
   exNames = ','.join(exchanges)
   msg = f'❌ Pairs not found in {exNames} : {pairs.upper()}'
-  if check_pairs(pairs) is not None:
+  result, exName = check_pairs(pairs)
+  print(pairs, result, exName)
+  if result is not None:
     allPairs.append(pairs)
     refetch()
     save_file('crypto-info.json', {"pairs": allPairs})
     msg = f'✅ Pairs added : {pairs.upper()}'
   return msg
-
 
 def save_graph(pairs, tf):
   plt.xlabel('Days')
@@ -277,31 +279,35 @@ def save_graph(pairs, tf):
   plt.close()
 
 def generate_graph(pairs, tf='86400'):
-    msg = None
-    if pairs not in allPairs:
-      msg = f'❌ Pairs does not exists : {pairs.upper()}' 
-    else:
-      save_graph(pairs, tf)
-    return msg
-  
+  msg = None
+  if pairs not in allPairs:
+    msg = f'❌ Pairs does not exists : {pairs.upper()}' 
+  else:
+    save_graph(pairs, tf)
+  return msg
+
+def get_availabel_exchange():
+  msg = ','.join([x.upper() for x in exchanges])
+  return msg
+
 def init():
-    global allPairs, cryptoData
-    print("Application starting...")
+  global allPairs, cryptoData
+  print("Application starting...")
 
-    if not file_exists("crypto-info.json"):
-      allPairs = open_file('crypto-info.default.json', directory='default')['pairs']
-    else:
-      allPairs = open_file('crypto-info.json')['pairs']
-    
-    if not file_exists("crypto-data.json"):
-      cryptoData = open_file('crypto-data.default.json', directory='default')
-    else:
-      cryptoData = open_file('crypto-data.json')
+  if not file_exists("crypto-info.json"):
+    allPairs = open_file('crypto-info.default.json', directory='default')['pairs']
+  else:
+    allPairs = open_file('crypto-info.json')['pairs']
+  
+  if not file_exists("crypto-data.json"):
+    cryptoData = open_file('crypto-data.default.json', directory='default')
+  else:
+    cryptoData = open_file('crypto-data.json')
 
-    refetch()
+  refetch()
 
-    plt.rcParams['figure.figsize'] = [20, 12]
-    plt.rcParams["figure.autolayout"] = True
-    plt.plot([1,2,3], [1,2,3])
-    plt.savefig(os.path.join(os.getcwd(), "data", 'graph.png'))
-    plt.close()
+  plt.rcParams['figure.figsize'] = [20, 12]
+  plt.rcParams["figure.autolayout"] = True
+  plt.plot([1,2,3], [1,2,3])
+  plt.savefig(os.path.join(os.getcwd(), "data", 'graph.png'))
+  plt.close()

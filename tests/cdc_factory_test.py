@@ -1,4 +1,4 @@
-from src.cdc_factory import add_pairs, check_if_pairs_exists, check_pairs, get_historical_signal, init, get_availabel_pairs
+from src.cdc_factory import add_pairs, check_if_pairs_exists, check_pairs, get_availabel_exchange, get_historical_signal, init, get_availabel_pairs
 
 
 def start_test():
@@ -23,3 +23,6 @@ def start_test():
   print("=== Get Historical signals ===")
   print(get_historical_signal('btcusdt'))
   print(get_historical_signal('btcthb'))
+
+  print("=== Get Availabel Exchanges ===")
+  print(get_availabel_exchange())
