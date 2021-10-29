@@ -30,8 +30,6 @@ allPairs = []
 
 exchanges = ['binance', 'okex', 'ftx']
 
-exIndexes = {}
-
 TF_NAME = {
   '86400': '1 day',
   '43200': '12 hours'
@@ -99,7 +97,7 @@ def fetch_crypto_pairs(pairs):
         'timestamps': timestamps,
     }
     cryptoData[tf][pairs]['signals'] = get_historical_signal_data(tf, pairs)
-    exIndexes[pairs] = exName
+    cryptoData['exchange_indexes'][pairs] = exName
 
     print(f'Successfully fetched : {pairs.upper()} with tf {tf}')
 
@@ -153,10 +151,11 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
   (buy, sell, noSignal, timestamp, closingPrice) = get_signal(tf, pairs, dayOffset)
   formatTime = get_format_time(timestamp)
   msg = ''
+  exName = cryptoData['exchange_indexes'][pairs].upper()
   if buy:
-      msg = f'\n{formatTime} :{exIndexes[pairs]}: {pairs.upper()} : BUY 🟢 at {closingPrice}$'
+      msg = f'\n{formatTime} : {exName} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
   elif sell:
-      msg = f'\n{formatTime} :{exIndexes[pairs]}: {pairs.upper()} : SELL 🔴 at {closingPrice}$'
+      msg = f'\n{formatTime} : {exName} : {pairs.upper()} : SELL 🔴 at {closingPrice}$'
 
   return msg
 
@@ -228,20 +227,18 @@ def check_pairs(pairs):
 
 def check_if_pairs_exists(pairs):
   if pairs in allPairs:
-
-    exName = cryptoData['86400'][pairs]['exchange']
-
-    return f'✅ Pairs already exists : {exName.upper()} : {pairs.upper()}'
+    exName = cryptoData['exchange_indexes'][pairs].upper()
+    return f'✅ Pairs already exists : {exName} : {pairs.upper()}'
   else:
     return f'❌ Pairs does not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
 
 def add_pairs(pairs): 
   if pairs in allPairs:
-    return  f'✅ Pairs already exists : {exIndexes[pairs]} : {pairs.upper()}'
+    exName = cryptoData['exchange_indexes'][pairs].upper()
+    return f'✅ Pairs already exists : {exName} : {pairs.upper()}'
   exNames = ','.join(exchanges)
   msg = f'❌ Pairs not found in {exNames} : {pairs.upper()}'
   result, exName = check_pairs(pairs)
-  print(pairs, result, exName)
   if result is not None:
     allPairs.append(pairs)
     refetch()
@@ -254,7 +251,8 @@ def save_graph(pairs, tf):
   plt.ylabel('Prices')
 
   x_axis =  cryptoData[tf][pairs]['timestamps']
-  plt.title(pairs.upper(), fontsize=20)
+  exName = cryptoData['exchange_indexes'][pairs].upper()
+  plt.title(f'{pairs.upper()} ({exName})', fontsize=20)
 
   plt.xticks(rotation=90)
 

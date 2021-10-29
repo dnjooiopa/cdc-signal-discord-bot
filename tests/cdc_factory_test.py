@@ -15,6 +15,7 @@ def start_test():
   print(add_pairs('btcusdt'))
   print(add_pairs('btcthb'))
   print(add_pairs('dydxusdt'))
+  print(add_pairs('copeusd'))
 
   print("=== Check if Pairs exists ===")
   print(check_if_pairs_exists('btcusdt'))
