@@ -83,7 +83,7 @@ async def on_message(message):
       msg += '\n\nℹ️ Use command below for more information.```!cdc info```'
       msg += get_all_signals(0)
     else:
-      if cmds[1] == 'update':
+      if cmds[1] == 'update': #2
         refetch()
         msg = get_all_signals(0)
       elif cmds[1] == 'future':
@@ -92,7 +92,10 @@ async def on_message(message):
         msg = get_availabel_pairs()
       elif cmds[1] == 'info':
         msg = 'รอก่อน กำลังทำ...'
-      elif cmds[1] == 'history' and cmds[2] is not None:
+      elif cmds[1] == 'checktime':
+        now = datetime.now()
+        msg = now.strftime('%Y:%m:%d %H:%M:%S')
+      elif cmds[1] == 'history' and cmds[2] is not None: # 3
         msg = get_historical_signal(cmds[2].lower())
       elif cmds[1] == 'add' and cmds[2] is not None:
         msg = add_pairs(cmds[2].lower())
