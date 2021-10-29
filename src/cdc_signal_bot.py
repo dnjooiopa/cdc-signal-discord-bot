@@ -94,7 +94,7 @@ async def on_message(message):
         msg = 'รอก่อน กำลังทำ...'
       elif cmds[1] == 'checktime':
         now = datetime.now()
-        msg = now.strftime('%Y:%m:%dT%H:%M:%S')
+        msg = '⏱ : ' + now.strftime('%Y:%m:%dT%H:%M:%S')'
       elif cmds[1] == 'exchange' or cmds[1] == 'exchanges' or cmds[1] == 'ex':
         msg = get_availabel_exchange()
       elif cmds[1] == 'history' and cmds[2] is not None: # 3
