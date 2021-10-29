@@ -28,6 +28,8 @@ cryptoData = {
 
 allPairs = []
 
+exchanges = ['binance', 'okex', 'ftx']
+
 TF_NAME = {
   '86400': '1 day',
   '43200': '12 hours'
@@ -57,11 +59,16 @@ def make_request(url):
 
 def fetch_crypto_pairs(pairs):
   global cryptoData
-  
-  url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
 
   for tf in periods:
-    result = make_request(url)
+    result = None
+    exName = None
+    for ex in exchanges:
+      url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
+      result = make_request(url)
+      exName = ex
+      if result is not None:
+        break
 
     if result is None:
       print(f'Error cannot fetch : {pairs.upper()}')
@@ -87,7 +94,8 @@ def fetch_crypto_pairs(pairs):
         'closing_prices': closingPrices,
         'ema12': ema12,
         'ema26': ema26,
-        'timestamps': timestamps
+        'timestamps': timestamps,
+        'exchange': exName
     }
     cryptoData[tf][pairs]['signals'] = get_historical_signal_data(tf, pairs)
 
@@ -205,9 +213,15 @@ def get_availabel_pairs():
   return msg
 
 def check_pairs(pairs):
-  url = f'https://api.cryptowat.ch/markets/binance/{pairs}/ohlc'
-  result = make_request(url)
-  return result
+  result = None
+  exName = None
+  for ex in exchanges:
+    exName = ex
+    url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
+    result = make_request(url)
+    if result is not None:
+      break
+  return result, exName
 
 def check_if_pairs_exists(pairs):
   if pairs in allPairs:
@@ -218,8 +232,8 @@ def check_if_pairs_exists(pairs):
 def add_pairs(pairs): 
   if pairs in allPairs:
     return  f'✅ Pairs already exists : {pairs.upper()}'
-
-  msg = f'❌ Pairs not found in Binance : {pairs.upper()}'
+  exNames = ','.join(exchanges)
+  msg = f'❌ Pairs not found in {exNames} : {pairs.upper()}'
   if check_pairs(pairs) is not None:
     allPairs.append(pairs)
     refetch()
