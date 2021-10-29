@@ -250,7 +250,8 @@ def add_pairs(pairs):
     allPairs.append(pairs)
     refetch()
     save_file('crypto-info.json', {"pairs": allPairs})
-    msg = f'✅ Pairs added : {pairs.upper()}'
+    exName = cryptoData['exchange_indexes'][pairs]
+    msg = f'✅ Pairs added : {exName.upper()} : {pairs.upper()}'
   return msg
 
 def save_graph(pairs, tf):
