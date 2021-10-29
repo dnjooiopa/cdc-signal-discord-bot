@@ -210,8 +210,15 @@ def get_all_signals(dayOffset):
     return msg
 
 def get_availabel_pairs():
-  msg = ','.join([x.upper() for x in allPairs])
-  msg += f'\nPairs Availabel : {len(allPairs)}'
+
+  msg = ''
+  for ex in exchanges:
+    msg += f'\n✅ {ex.upper()}:\n'
+    for pairs in cryptoData['exchange_indexes'].keys():
+      if cryptoData['exchange_indexes'][pairs] == ex:
+        msg += pairs.upper() + ','
+
+  msg += f'\n\n🪙 Pairs Availabel : {len(allPairs)}'
   return msg
 
 def check_pairs(pairs):
