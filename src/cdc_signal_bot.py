@@ -12,12 +12,15 @@ from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, 
 
 bot = commands.Bot(command_prefix='!cdc')
 
+def get_local_time(timestamp):
+  localTimestamp = timestamp + (7*60*60)
+  return datetime.utcfromtimestamp(localTimestamp).strftime("%Y:%m:%dT%H:%M:%S")
+
 async def send_update_signal():
   timestamp = time.time()
   currentUTCTime = datetime.utcfromtimestamp(timestamp).strftime("%H:%M")
   
-  localTimestamp = timestamp + (7*60*60)
-  currentLocalTime = datetime.utcfromtimestamp(localTimestamp).strftime("%Y:%m:%dT%H:%M:%S")
+  currentLocalTime = get_local_time(timestamp)
 
   refetch()
   print('Sending... update')
@@ -96,8 +99,9 @@ async def on_message(message):
       elif cmds[1] == 'info':
         msg = 'รอก่อน กำลังทำ...'
       elif cmds[1] == 'checktime':
-        now = datetime.now()
-        msg = '⏱ : ' + now.strftime('%Y:%m:%dT%H:%M:%S')
+        timestamp = time.time()
+        currentLocalTime = get_local_time(timestamp)
+        msg = '⏱  ' + currentLocalTime
       elif cmds[1] == 'exchange' or cmds[1] == 'exchanges' or cmds[1] == 'ex':
         msg = get_availabel_exchange()
       elif cmds[1] == 'history' and cmds[2] is not None: # 3
