@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 import os
+import time
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -12,15 +13,17 @@ from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, 
 bot = commands.Bot(command_prefix='!cdc')
 
 async def send_update_signal():
-  now = datetime.now()
-  current_time = now.strftime("%H:%M")
-  current_date = now.strftime("%Y:%m:%dT%H:%M:%S")
+  timestamp = time.time()
+  currentUTCTime = datetime.utcfromtimestamp(timestamp).strftime("%H:%M")
+  
+  localTimestamp = timestamp + (7*60*60)
+  currentLocalTime = datetime.utcfromtimestamp(localTimestamp).strftime("%Y:%m:%dT%H:%M:%S")
 
   refetch()
   print('Sending... update')
-  msg = f'\n✅ Authomatic update: {current_date}'
+  msg = f'\n✅ Authomatic update: {currentLocalTime}'
   
-  if current_time == "00:00":
+  if currentUTCTime == "00:00":
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msg += get_all_signals(0)
     await channel.send(msg)
@@ -83,7 +86,7 @@ async def on_message(message):
       msg += '\n\nℹ️ Use command below for more information.```!cdc info```'
       msg += get_all_signals(0)
     else:
-      if cmds[1] == 'update': #2
+      if cmds[1] == 'update': # 2
         refetch()
         msg = get_all_signals(0)
       elif cmds[1] == 'future':
