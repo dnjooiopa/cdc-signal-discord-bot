@@ -287,13 +287,13 @@ def save_graph(pairs, tf):
   for i, txt in enumerate(buySignals['closing_prices']):
     formatTime = get_format_time(buySignals['timestamps'][i])
     label = f'   {formatTime}'
-    label += f'\n   BUY at: {txt}$'
+    label += f'\n   BUY at {txt}$'
     plt.annotate(label, (buySignals['timestamps'][i], buySignals['closing_prices'][i]))
 
   for i, txt in enumerate(sellSignals['closing_prices']):
     formatTime = get_format_time(sellSignals['timestamps'][i])
     label = f'   {formatTime}'
-    label += f'\n   SELL at: {txt}$'
+    label += f'\n   SELL at {txt}$'
     plt.annotate(label, (sellSignals['timestamps'][i], sellSignals['closing_prices'][i]), color='red')
 
   plt.savefig(os.path.join(os.getcwd(), "data", 'graph.png'))
