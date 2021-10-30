@@ -296,6 +296,7 @@ def save_graph(pairs, tf):
     label += f'\n   SELL at {txt}$'
     plt.annotate(label, (sellSignals['timestamps'][i], sellSignals['closing_prices'][i]), color='red')
 
+  plt.legend()
   plt.savefig(os.path.join(os.getcwd(), "data", 'graph.png'))
   plt.close()
 
