@@ -110,7 +110,7 @@ async def on_message(message):
         msg = add_pairs(cmds[2].lower())
       elif cmds[1] == 'check' and cmds[2] is not None:
         msg = check_pairs(cmds[2].lower())
-      elif cmds[1] == 'graph':
+      elif cmds[1] == 'graph' and cmds[2] is not None:
         tf  = cmds[3] if cmds[3] is not None else '1d'
         await send_graph(message.channel, cmds[2], tf)
         sent = True
