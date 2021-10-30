@@ -182,9 +182,12 @@ def get_historical_signal(pairs):
       backwardDays = availableDays
 
     msg += f'\n📈 Historical signal for time frame {TF_NAME[tf]} (last {days} days)'
+    historicalMsg = ''
     for i in range(availableDays - backwardDays + 1, availableDays):
-      msg += get_signal_with_pairs(tf, pairs, -backwardDays+2+i)
-  return msg
+      historicalMsg += get_signal_with_pairs(tf, pairs, -backwardDays+2+i)
+    if historicalMsg == '':
+      historicalMsg = '\nNo historical signal'
+  return msg + historicalMsg
 
 def get_historical_signal_data(tf, pairs):
   availableDays = len(cryptoData[tf][pairs]['timestamps'])
