@@ -6,7 +6,7 @@ import os
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from src.cdc_factory import add_pairs, check_if_pairs_exists, generate_graph, get_availabel_exchange, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals
+from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals
 from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, HOUR, MINUTE, SECOND
 
 bot = commands.Bot(command_prefix='!cdc')
@@ -94,7 +94,7 @@ async def on_message(message):
         msg = 'รอก่อน กำลังทำ...'
       elif cmds[1] == 'checktime':
         now = datetime.now()
-        msg = '⏱ : ' + now.strftime('%Y:%m:%dT%H:%M:%S')'
+        msg = '⏱ : ' + now.strftime('%Y:%m:%dT%H:%M:%S')
       elif cmds[1] == 'exchange' or cmds[1] == 'exchanges' or cmds[1] == 'ex':
         msg = get_availabel_exchange()
       elif cmds[1] == 'history' and cmds[2] is not None: # 3
@@ -102,7 +102,7 @@ async def on_message(message):
       elif cmds[1] == 'add' and cmds[2] is not None:
         msg = add_pairs(cmds[2].lower())
       elif cmds[1] == 'check' and cmds[2] is not None:
-        msg = check_if_pairs_exists(cmds[2].lower())
+        msg = check_pairs(cmds[2].lower())
       elif cmds[1] == 'graph':
         tf  = cmds[3] if cmds[3] is not None else '1d'
         await send_graph(message.channel, cmds[2], tf)

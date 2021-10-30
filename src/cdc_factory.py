@@ -221,7 +221,7 @@ def get_availabel_pairs():
   msg += f'\n\n🪙 Pairs Availabel : {len(allPairs)}'
   return msg
 
-def check_pairs(pairs):
+def find_pairs(pairs):
   result = None
   exName = None
   for ex in exchanges:
@@ -232,10 +232,17 @@ def check_pairs(pairs):
       break
   return result, exName
 
-def check_if_pairs_exists(pairs):
+def get_last_price(ex, pairs):
+  url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/price'
+  result = make_request(url)
+  currentPrice = None if result is None else result['price']
+  return currentPrice
+
+def check_pairs(pairs):
   if pairs in allPairs:
     exName = cryptoData['exchange_indexes'][pairs].upper()
-    return f'✅ Pairs already exists : {exName} : {pairs.upper()}'
+    currentPrice = get_last_price(exName, pairs)
+    return f'✅ Pairs already exists : {exName} : {pairs.upper()}\n💰 Current Price : {currentPrice}$'
   else:
     return f'❌ Pairs does not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
 
@@ -245,7 +252,7 @@ def add_pairs(pairs):
     return f'✅ Pairs already exists : {exName} : {pairs.upper()}'
   exNames = ','.join(exchanges)
   msg = f'❌ Pairs not found in {exNames} : {pairs.upper()}'
-  result, exName = check_pairs(pairs)
+  result, exName = find_pairs(pairs)
   if result is not None:
     allPairs.append(pairs)
     refetch()
