@@ -14,21 +14,9 @@ closeIdx = 4
 current_unix_time = int(time.time())
 days = 120
 
-periods = ['86400', '43200']
-parameters = {
-  'apikey': API_KEY,
-  'after': current_unix_time - (86400*days),
-  'periods': '43200,86400'
-}
+parameters = {}
 
-cryptoData = {
-    '43200': {},
-    '86400': {}
-}
-
-allPairs = []
-
-exchanges = ['binance', 'okex', 'ftx']
+crypto = {}
 
 TF_NAME = {
   '86400': '1 day',
@@ -60,20 +48,20 @@ def make_request(url):
 def fetch_crypto_pairs(pairs):
   global cryptoData
 
-  for tf in periods:
-    result = None
-    exName = None
-    for ex in exchanges:
-      url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
-      result = make_request(url)
-      if result is not None:
-        exName = ex
-        break
+  result = None
+  exName = None
+  for ex in crypto['exchanges']:
+    url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
+    result = make_request(url)
+    if result is not None:
+      exName = ex
+      break
 
-    if result is None:
+  if result is None:
       print(f'Error cannot fetch : {pairs.upper()}')
-      continue
+      return
 
+  for tf in crypto['time_frames']:
     data = result[tf]
 
     if len(data) < 27:
@@ -90,14 +78,15 @@ def fetch_crypto_pairs(pairs):
     closingPrices = closingPrices[25:]
 
    
-    cryptoData[tf][pairs] = {
+    crypto['data'][tf][pairs] = {
         'closing_prices': closingPrices,
         'ema12': ema12,
         'ema26': ema26,
-        'timestamps': timestamps,
+        'timestamps': timestamps
     }
-    cryptoData[tf][pairs]['signals'] = get_historical_signal_data(tf, pairs)
-    cryptoData['exchange_indexes'][pairs] = exName
+    crypto['data'][tf][pairs]['signals'] = get_historical_signal_data(tf, pairs)
+    
+    crypto['exchange_indexes'][pairs] = exName
 
     print(f'Successfully fetched : {pairs.upper()} with tf {tf}')
 
@@ -119,26 +108,30 @@ def file_exists(fileName, directory='data'):
 def refetch():
   print("Refetching...")
   t1 = time.time()
-  for tf in periods:
-      for pairs in allPairs:
-          if pairs in cryptoData[tf]:
-              if int(time.time()) > cryptoData[tf][pairs]['timestamps'][-1]:
-                  fetch_crypto_pairs(pairs)
-          else:
-              fetch_crypto_pairs(pairs)
+  for pairs in crypto['pairs']:
+    outdate = False
+    if pairs in crypto['data']['86400'] or pairs in crypto['data']['86400']:
+      for tf in crypto['time_frames']:
+        if int(time.time()) > crypto['data'][tf][pairs]['timestamps'][-1]:
+          outdate = True
+          break
+      if outdate:
+        fetch_crypto_pairs(pairs) 
+    else:
+      fetch_crypto_pairs(pairs)
   t2 = time.time()
-  save_file('crypto-data.json', cryptoData)
+  save_file('crypto-data.json', crypto)
   print(f'Fetched time usage: {round((t2 - t1),2)} seconds')
 
-def get_signal(period, pairs, dayOffSet=0):
+def get_signal(tf, pairs, dayOffSet=0):
   currentIdx = dayOffSet-2
   previousIdx = dayOffSet-3
 
-  isBuySignal = cryptoData[period][pairs]['ema12'][currentIdx] > cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] < cryptoData[period][pairs]['ema26'][previousIdx]
-  isSellSignal = cryptoData[period][pairs]['ema12'][currentIdx] < cryptoData[period][pairs]['ema26'][currentIdx] and cryptoData[period][pairs]['ema12'][previousIdx] > cryptoData[period][pairs]['ema26'][previousIdx]
+  isBuySignal = crypto['data'][tf][pairs]['ema12'][currentIdx] > crypto['data'][tf][pairs]['ema26'][currentIdx] and crypto['data'][tf][pairs]['ema12'][previousIdx] < crypto['data'][tf][pairs]['ema26'][previousIdx]
+  isSellSignal = crypto['data'][tf][pairs]['ema12'][currentIdx] < crypto['data'][tf][pairs]['ema26'][currentIdx] and crypto['data'][tf][pairs]['ema12'][previousIdx] > crypto['data'][tf][pairs]['ema26'][previousIdx]
   
-  timestamp = cryptoData[period][pairs]['timestamps'][currentIdx]
-  closingPrice = cryptoData[period][pairs]['closing_prices'][currentIdx]
+  timestamp = crypto['data'][tf][pairs]['timestamps'][currentIdx]
+  closingPrice = crypto['data'][tf][pairs]['closing_prices'][currentIdx]
 
   if isBuySignal:
       return (True, False, False, timestamp, closingPrice)
@@ -151,7 +144,7 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
   (buy, sell, noSignal, timestamp, closingPrice) = get_signal(tf, pairs, dayOffset)
   formatTime = get_format_time(timestamp)
   msg = ''
-  exName = cryptoData['exchange_indexes'][pairs].upper()
+  exName = crypto['exchange_indexes'][pairs].upper()
   if buy:
       msg = f'\n{formatTime} : {exName} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
   elif sell:
@@ -162,7 +155,7 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
 def get_signals_with_tf(tf, dayOffset):
     msg = f'\n📈 Time frame {TF_NAME[tf]}'
 
-    for pairs in allPairs:
+    for pairs in crypto['pairs']:
         signalMsg = get_signal_with_pairs(tf, pairs, dayOffset)
         msg += signalMsg
     if 'BUY' not in msg and 'SELL' not in msg:
@@ -170,14 +163,13 @@ def get_signals_with_tf(tf, dayOffset):
     return msg
 
 def get_historical_signal(pairs):
-  print(pairs not in allPairs)
-  if pairs not in allPairs:
+  if pairs not in crypto['pairs']:
     return f'❌ Pairs not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
 
   msg = ''
-  for tf in periods:
+  for tf in crypto['time_frames']:
     backwardDays=1000
-    availableDays = len(cryptoData[tf][pairs]['timestamps'])
+    availableDays = len(crypto['data'][tf][pairs]['timestamps'])
     if backwardDays > availableDays:
       backwardDays = availableDays
 
@@ -190,7 +182,7 @@ def get_historical_signal(pairs):
   return msg + historicalMsg
 
 def get_historical_signal_data(tf, pairs):
-  availableDays = len(cryptoData[tf][pairs]['timestamps'])
+  availableDays = len(crypto['data'][tf][pairs]['timestamps'])
 
   signals = {'buys': {'closing_prices': [], 'timestamps': []}, 'sells': {'closing_prices': [], 'timestamps': []}}
   for i in range(1, availableDays):
@@ -206,7 +198,7 @@ def get_historical_signal_data(tf, pairs):
 
 def get_all_signals(dayOffset):
     msg = ''
-    for tf in periods:
+    for tf in crypto['time_frames']:
       signalMsg = get_signals_with_tf(tf, dayOffset)
       msg += signalMsg
 
@@ -215,19 +207,19 @@ def get_all_signals(dayOffset):
 def get_availabel_pairs():
 
   msg = ''
-  for ex in exchanges:
+  for ex in crypto['exchanges']:
     msg += f'\n✅ {ex.upper()}:\n'
-    for pairs in cryptoData['exchange_indexes'].keys():
-      if cryptoData['exchange_indexes'][pairs] == ex:
+    for pairs in crypto['exchange_indexes'].keys():
+      if crypto['exchange_indexes'][pairs] == ex:
         msg += pairs.upper() + ','
-
+  allPairs = crypto['pairs']
   msg += f'\n\n🪙 Pairs Availabel : {len(allPairs)}'
   return msg
 
 def find_pairs(pairs):
   result = None
   exName = None
-  for ex in exchanges:
+  for ex in crypto['exchanges']:
     url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
     result = make_request(url)
     if result is not None:
@@ -242,25 +234,25 @@ def get_last_price(ex, pairs):
   return currentPrice
 
 def check_pairs(pairs):
-  if pairs in allPairs:
-    exName = cryptoData['exchange_indexes'][pairs].upper()
+  if pairs in crypto['pairs']:
+    exName = crypto['exchange_indexes'][pairs].upper()
     currentPrice = get_last_price(exName, pairs)
     return f'✅ Pairs already exists : {exName} : {pairs.upper()}\n💰 Current Price : {currentPrice}$'
   else:
     return f'❌ Pairs does not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
 
 def add_pairs(pairs): 
-  if pairs in allPairs:
-    exName = cryptoData['exchange_indexes'][pairs].upper()
+  if pairs in crypto['pairs']:
+    exName = crypto['exchange_indexes'][pairs].upper()
     return f'✅ Pairs already exists : {exName} : {pairs.upper()}'
-  exNames = ','.join(exchanges)
+  exNames = ','.join(crypto['exchanges'])
   msg = f'❌ Pairs not found in {exNames} : {pairs.upper()}'
   result, exName = find_pairs(pairs)
   if result is not None:
-    allPairs.append(pairs)
+    crypto['pairs'].append(pairs)
     refetch()
-    save_file('crypto-info.json', {"pairs": allPairs})
-    exName = cryptoData['exchange_indexes'][pairs]
+    exName = crypto['exchange_indexes'][pairs]
+    save_file('crypto-data.json', crypto)
     msg = f'✅ Pairs added : {exName.upper()} : {pairs.upper()}'
   return msg
 
@@ -268,18 +260,18 @@ def save_graph(pairs, tf):
   plt.xlabel('Days')
   plt.ylabel('Prices')
 
-  x_axis =  cryptoData[tf][pairs]['timestamps']
-  exName = cryptoData['exchange_indexes'][pairs].upper()
+  x_axis =  crypto['data'][tf][pairs]['timestamps']
+  exName = crypto['exchange_indexes'][pairs].upper()
   plt.title(f'{pairs.upper()} ({exName})', fontsize=20)
 
   plt.xticks(rotation=90)
 
-  plt.plot(x_axis, cryptoData[tf][pairs]['closing_prices'], label='closing prices', color='cornflowerblue')
-  plt.plot(x_axis, cryptoData[tf][pairs]['ema12'], label='EMA12', color='gold')
-  plt.plot(x_axis, cryptoData[tf][pairs]['ema26'], label='EMA26', color='plum')
+  plt.plot(x_axis, crypto['data'][tf][pairs]['closing_prices'], label='closing prices', color='cornflowerblue')
+  plt.plot(x_axis, crypto['data'][tf][pairs]['ema12'], label='EMA12', color='gold')
+  plt.plot(x_axis, crypto['data'][tf][pairs]['ema26'], label='EMA26', color='plum')
 
-  buySignals = cryptoData[tf][pairs]['signals']['buys']
-  sellSignals = cryptoData[tf][pairs]['signals']['sells']
+  buySignals = crypto['data'][tf][pairs]['signals']['buys']
+  sellSignals = crypto['data'][tf][pairs]['signals']['sells']
 
   plt.scatter(buySignals['timestamps'], buySignals['closing_prices'], s=100, color='green')
   plt.scatter(sellSignals['timestamps'], sellSignals['closing_prices'], s=100, color='red')
@@ -302,29 +294,30 @@ def save_graph(pairs, tf):
 
 def generate_graph(pairs, tf='86400'):
   msg = None
-  if pairs not in allPairs:
+  if pairs not in crypto['pairs']:
     msg = f'❌ Pairs does not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
   else:
     save_graph(pairs, tf)
   return msg
 
 def get_availabel_exchange():
-  msg = ','.join([x.upper() for x in exchanges])
+  msg = ','.join([x.upper() for x in crypto['exchanges']])
   return msg
 
 def init():
-  global allPairs, cryptoData
+  global crypto, parameters
   print("Application starting...")
-
-  if not file_exists("crypto-info.json"):
-    allPairs = open_file('crypto-info.default.json', directory='default')['pairs']
-  else:
-    allPairs = open_file('crypto-info.json')['pairs']
   
   if not file_exists("crypto-data.json"):
-    cryptoData = open_file('crypto-data.default.json', directory='default')
+    crypto = open_file('crypto-data.default.json', directory='default')
   else:
-    cryptoData = open_file('crypto-data.json')
+    crypto = open_file('crypto-data.json')
+
+  parameters = {
+    'apikey': API_KEY,
+    'after': current_unix_time - (86400*days),
+    'periods': ','.join(crypto['time_frames'])
+    }
 
   refetch()
 
