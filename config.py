@@ -13,3 +13,5 @@ WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE')
 HOUR = os.getenv('HOUR')
 MINUTE = os.getenv('MINUTE')
 SECOND = os.getenv('SECOND')
+
+ADMIN_ID = os.getenv('ADMIN_ID')
