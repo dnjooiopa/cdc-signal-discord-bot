@@ -77,42 +77,41 @@ async def on_message(message):
     print('contents')
     print(commands)
 
-    cmds = [None] * 4
-
-    for i, cmd in enumerate(commands):
-      if i >= 4:
-        break
-      cmds[i] = cmd
-
     if len(commands) == 1:
       msg = f'🚷 {WELCOME_MESSAGE} 🚀🚀'
       msg += '\n\nℹ️ Use command below for more information.```!cdc info```'
       msg += get_all_signals(0)
-    else:
-      if cmds[1] == 'update': # 2
+    elif len(commands) == 2:
+      if commands[1] == 'update':
         refetch()
         msg = get_all_signals(0)
-      elif cmds[1] == 'future':
+      elif commands[1] == 'future':
         msg = get_all_signals(1)
-      elif cmds[1] == 'pairs' or cmds[1] == 'list':
+      elif commands[1] == 'pairs' or commands[1] == 'list':
         msg = get_availabel_pairs()
-      elif cmds[1] == 'info':
+      elif commands[1] == 'info':
         msg = 'รอก่อน กำลังทำ...'
-      elif cmds[1] == 'checktime':
+      elif commands[1] == 'checktime':
         timestamp = time.time()
         currentLocalTime = get_local_time(timestamp)
         msg = '⏱  ' + currentLocalTime
-      elif cmds[1] == 'exchange' or cmds[1] == 'exchanges' or cmds[1] == 'ex':
+      elif commands[1] == 'exchange' or commands[1] == 'exchanges' or commands[1] == 'ex':
         msg = get_availabel_exchange()
-      elif cmds[1] == 'history' and cmds[2] is not None: # 3
-        msg = get_historical_signal(cmds[2].lower())
-      elif cmds[1] == 'add' and cmds[2] is not None:
-        msg = add_pairs(cmds[2].lower())
-      elif cmds[1] == 'check' and cmds[2] is not None:
-        msg = check_pairs(cmds[2].lower())
-      elif cmds[1] == 'graph' and cmds[2] is not None:
-        tf  = cmds[3] if cmds[3] is not None else '1d'
-        await send_graph(message.channel, cmds[2], tf)
+    elif len(commands) == 3:
+      if commands[1] == 'history':
+        msg = get_historical_signal(commands[2].lower())
+      elif commands[1] == 'add':
+        msg = add_pairs(commands[2].lower())
+      elif commands[1] == 'check':
+        msg = check_pairs(commands[2].lower())
+      elif commands[1] == 'graph':
+        await send_graph(message.channel, commands[2], '1d')
+        sent = True 
+      elif commands[1] == 'remove' or commands[1] == 'rm':
+        msg = 'removing ...'
+    elif len(commands) == 4:
+      if commands[1] == 'graph':
+        await send_graph(message.channel, commands[2], commands[3])
         sent = True
 
     if sent is False:
