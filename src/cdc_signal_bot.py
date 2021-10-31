@@ -6,8 +6,9 @@ import time
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from discord.ext.commands.core import command
 
-from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals
+from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals, remove_pairs
 from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, HOUR, MINUTE, SECOND, ADMIN_ID
 
 bot = commands.Bot(command_prefix='!cdc')
@@ -74,11 +75,10 @@ async def on_message(message):
   sent = False
   if msgContent.startswith('!cdc') :
     commands = msgContent.split(' ')
-    print('contents')
-    print(commands)
+    print('commands:', commands)
 
     if len(commands) == 1:
-      msg = f'🚷 {WELCOME_MESSAGE} 🚀🚀'
+      msg = f'🚷 {WELCOME_MESSAGE} 🚀'
       msg += '\n\nℹ️ Use command below for more information.```!cdc info```'
       msg += get_all_signals(0)
     elif len(commands) == 2:
@@ -105,13 +105,17 @@ async def on_message(message):
       elif commands[1] == 'check':
         msg = check_pairs(commands[2].lower())
       elif commands[1] == 'graph':
-        await send_graph(message.channel, commands[2], '1d')
+        print(commands[2].lower())
+        await send_graph(message.channel, commands[2].lower(), '1d')
         sent = True 
       elif commands[1] == 'remove' or commands[1] == 'rm':
-        msg = 'removing ...'
+        if message.author.id == ADMIN_ID:
+          msg = remove_pairs(commands[2].lower())
+        else:
+          msg = '\n🚫 Only admin can remove pairs'
     elif len(commands) == 4:
       if commands[1] == 'graph':
-        await send_graph(message.channel, commands[2], commands[3])
+        await send_graph(message.channel, commands[2].lower(), commands[3])
         sent = True
 
     if sent is False:

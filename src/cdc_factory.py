@@ -256,6 +256,20 @@ def add_pairs(pairs):
     msg = f'✅ Pairs added : {exName.upper()} : {pairs.upper()}'
   return msg
 
+def remove_pairs(pairs):
+  if pairs in crypto['pairs']:
+    crypto['pairs'].remove(pairs)
+    del crypto['exchange_indexes'][pairs]
+
+    for tf in crypto['time_frames']:
+      del crypto['data'][tf][pairs]
+
+    save_file('crypto-data.json', crypto)
+
+    return f'✅ Pairs has been removed: {pairs.upper()}'
+  else:
+    return f'❌ Pairs does not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
+
 def save_graph(pairs, tf):
   plt.xlabel('Days')
   plt.ylabel('Prices')
@@ -290,6 +304,7 @@ def save_graph(pairs, tf):
 
   plt.legend()
   plt.savefig(os.path.join(os.getcwd(), "data", 'graph.png'))
+  print('graph.png has been saved')
   plt.close()
 
 def generate_graph(pairs, tf='86400'):

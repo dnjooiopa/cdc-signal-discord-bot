@@ -1,4 +1,4 @@
-from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_historical_signal, init, get_availabel_pairs
+from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_historical_signal, init, get_availabel_pairs, remove_pairs
 
 
 def start_test():
@@ -12,6 +12,7 @@ def start_test():
   print(add_pairs('btcthb'))
   print(add_pairs('dydxusdt'))
   print(add_pairs('copeusd'))
+  print(add_pairs('waxpusdt'))
 
   print("=== Check if Pairs exists ===")
   print(check_pairs('btcusdt'))
@@ -27,3 +28,7 @@ def start_test():
   print("=== Generate Graph")
   generate_graph('btcusdt')
   generate_graph('btcthb')
+
+  print("=== Remove Pairs ====")
+  print(remove_pairs('waxpusdt'))
+  print(remove_pairs('waxpusdt'))
