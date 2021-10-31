@@ -76,7 +76,12 @@
     "hegicbusd",
     "linabusd",
     "tlmbusd",
-    "ilvbusd"
+    "ilvbusd",
+    "swftcusdt",
+    "velousdt",
+    "copeusd",
+    "atlasusd",
+    "polisusd"
   ],
   "exchange_indexes": {},
   "data": {
