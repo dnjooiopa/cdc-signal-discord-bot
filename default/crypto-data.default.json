@@ -67,7 +67,16 @@
     "fxsbusd",
     "minabusd",
     "tvkbusd",
-    "waxpbusd"
+    "waxpbusd",
+    "quickbusd",
+    "fttbusd",
+    "aliceusdt",
+    "ethusdt",
+    "manausdt",
+    "hegicbusd",
+    "linabusd",
+    "tlmbusd",
+    "ilvbusd"
   ],
   "exchange_indexes": {},
   "data": {
