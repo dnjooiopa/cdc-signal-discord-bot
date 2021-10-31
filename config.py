@@ -14,4 +14,4 @@ HOUR = os.getenv('HOUR')
 MINUTE = os.getenv('MINUTE')
 SECOND = os.getenv('SECOND')
 
-ADMIN_ID = os.getenv('ADMIN_ID')
+ADMIN_ID = int(os.getenv('ADMIN_ID'))
