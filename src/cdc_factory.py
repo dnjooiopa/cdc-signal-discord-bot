@@ -303,7 +303,7 @@ def save_graph(pairs, tf):
 def generate_graph(pairs, tf='86400'):
   msg = None
   if pairs not in allPairs:
-    msg = f'❌ Pairs does not exists : {pairs.upper()}' 
+    msg = f'❌ Pairs does not exists : {pairs.upper()}\nℹ️ Use command below to add new pairs.\n```!cdc add NEW_PAIRS```'
   else:
     save_graph(pairs, tf)
   return msg
