@@ -1,5 +1,4 @@
-from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_historical_signal, init, get_availabel_pairs, remove_pairs
-
+from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_historical_signal, init, get_availabel_pairs, remove_pairs, get_signals_with_tf
 
 def start_test():
 
@@ -32,3 +31,6 @@ def start_test():
   print("=== Remove Pairs ====")
   print(remove_pairs('waxpusdt'))
   print(remove_pairs('waxpusdt'))
+
+  print("=== Get signal with tf ===")
+  print(get_signals_with_tf('86400', 0))

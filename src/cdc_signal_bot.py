@@ -29,7 +29,7 @@ async def send_update_signal():
   
   if currentUTCTime == "00:00":
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
-    msg += get_all_signals(0)
+    msg += get_signals_with_tf('86400', 0)
     await channel.send(msg)
   else:
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
