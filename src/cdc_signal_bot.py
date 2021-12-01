@@ -84,9 +84,9 @@ async def on_message(message):
     elif len(commands) == 2:
       if commands[1] == 'update':
         refetch()
-        msg = get_all_signals(0)
+        msg = get_signals_with_tf('86400', 0)
       elif commands[1] == 'future':
-        msg = get_all_signals(1)
+        msg = get_signals_with_tf('86400', 1)
       elif commands[1] == 'pairs' or commands[1] == 'list':
         msg = get_availabel_pairs()
       elif commands[1] == 'info':
@@ -113,6 +113,11 @@ async def on_message(message):
           msg = remove_pairs(commands[2].lower())
         else:
           msg = '\n🚫 Only admin can remove pairs'
+      if commands[1] == 'update' and commands[2] == 'all':
+        refetch()
+        msg = get_all_signals(0)
+      elif commands[1] == 'future'  and commands[2] == 'all':
+        msg = get_all_signals(1)
     elif len(commands) == 4:
       if commands[1] == 'graph':
         await send_graph(message.channel, commands[2].lower(), commands[3])
