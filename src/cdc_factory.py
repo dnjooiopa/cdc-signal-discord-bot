@@ -61,7 +61,8 @@ def fetch_crypto_pairs(pairs):
     print(f'Error cannot fetch : {pairs.upper()}')
     return
 
-  if len(result['86400']) < 27:
+  if len(result['86400']) < 30:
+    print(pairs)
     return
 
   for tf in crypto['time_frames']:
@@ -155,7 +156,7 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
 def get_signals_with_tf(tf, dayOffset):
     msg = f'\n📈 Time frame {TF_NAME[tf]}'
 
-    for pairs in crypto['pairs']:
+    for pairs in crypto['exchange_indexes'].keys():
         signalMsg = get_signal_with_pairs(tf, pairs, dayOffset)
         msg += signalMsg
     if 'BUY' not in msg and 'SELL' not in msg:
