@@ -58,14 +58,14 @@ def fetch_crypto_pairs(pairs):
       break
 
   if result is None:
-      print(f'Error cannot fetch : {pairs.upper()}')
-      return
+    print(f'Error cannot fetch : {pairs.upper()}')
+    return
+
+  if len(result['86400']) < 27:
+    return
 
   for tf in crypto['time_frames']:
     data = result[tf]
-
-    if len(data) < 27:
-      continue
     
     closingPrices = [x[closeIdx] for x in data]
     timestamps = [x[timeIdx] for x in data]
