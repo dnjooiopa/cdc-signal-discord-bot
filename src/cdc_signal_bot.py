@@ -13,6 +13,13 @@ from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, 
 
 bot = commands.Bot(command_prefix='!cdc')
 
+async def sendMessage(channel, msg):
+  if len(msg) > 1900:
+    await channel.send(msg[:1900])
+    await channel.send(msg[1900:])
+  else:
+    await channel.send(msg)
+
 def get_local_time(timestamp):
   localTimestamp = timestamp + (7*60*60)
   return datetime.utcfromtimestamp(localTimestamp).strftime("%Y:%m:%dT%H:%M:%S")
@@ -30,11 +37,11 @@ async def send_update_signal():
   if currentUTCTime == "00:00":
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msg += get_signals_with_tf('86400', 0)
-    await channel.send(msg)
+    await sendMessage(channel, msg)
   else:
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msg += get_signals_with_tf('43200', 0)
-    await channel.send(msg)
+    await sendMessage(channel, msg)
 
 @bot.command()
 async def send_graph(channel, pairs, tfName):
@@ -124,7 +131,7 @@ async def on_message(message):
         sent = True
 
     if sent is False:
-      await message.channel.send(msg)
+      await sendMessage(message.channel, msg)
 
 def start():
   init()
