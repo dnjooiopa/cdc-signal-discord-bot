@@ -15,3 +15,4 @@ MINUTE = os.getenv('MINUTE')
 SECOND = os.getenv('SECOND')
 
 ADMIN_ID = int(os.getenv('ADMIN_ID'))
+DAYS = int(os.getenv('DAYS'))

@@ -5,14 +5,14 @@ import os
 import json
 import matplotlib.pyplot as plt
 
-from config import API_KEY
+from config import API_KEY, DAYS
 
 # Initialize Global Variable
 timeIdx = 0
 closeIdx = 4
 
 current_unix_time = int(time.time())
-days = 120
+days = DAYS
 
 parameters = {}
 
