@@ -188,7 +188,8 @@ def get_historical_signal(pairs):
     msg += f'\n📈 Historical signal for time frame {TF_NAME[tf]} (last {days} days)'
     historicalMsg = ''
     for i in range(availableDays - backwardDays + 1, availableDays):
-      historicalMsg += get_signal_with_pairs(tf, pairs, -backwardDays+2+i)
+      hMsg, _ = get_signal_with_pairs(tf, pairs, -backwardDays+2+i)
+      historicalMsg += hMsg
     if historicalMsg == '':
       historicalMsg = '\nNo historical signal'
   return msg + historicalMsg
