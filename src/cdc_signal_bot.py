@@ -42,13 +42,14 @@ async def send_update_signal():
   
   if currentUTCTime == "00:00":
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
-    msg += get_signals_with_tf('86400', 0)
+    msgSignal, signalPayload = get_signals_with_tf('86400', 0)
+    msg += msgSignal
     await sendMessage(channel, msg)
-    # Implement mqtt
-    # publish(string of array)
+    publish(str(signalPayload))
   else:
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
-    msg += get_signals_with_tf('43200', 0)
+    msgSignal, signalPayload = get_signals_with_tf('43200', 0)
+    msg += msgSignal
     await sendMessage(channel, msg)
 
 @bot.command()
@@ -99,9 +100,9 @@ async def on_message(message):
     elif len(commands) == 2:
       if commands[1] == 'update':
         refetch()
-        msg = get_signals_with_tf('86400', 0)
+        msg, _ = get_signals_with_tf('86400', 0)
       elif commands[1] == 'future':
-        msg = get_signals_with_tf('86400', 1)
+        msg, _ = get_signals_with_tf('86400', 1)
       elif commands[1] == 'pairs' or commands[1] == 'list':
         msg = get_availabel_pairs()
       elif commands[1] == 'info':
