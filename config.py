@@ -16,3 +16,8 @@ SECOND = os.getenv('SECOND')
 
 ADMIN_ID = int(os.getenv('ADMIN_ID'))
 DAYS = int(os.getenv('DAYS'))
+
+MQTT_USERNAME = os.getenv('MQTT_USERNAME')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD')
+MQTT_HOST = os.getenv('MQTT_HOST')
+MQTT_PORT = os.getenv('MQTT_PORT')

@@ -3,3 +3,4 @@ discord==1.7.3
 requests==2.26.0
 APScheduler==3.8.1
 matplotlib==3.4.3
+paho-mqtt==1.6.1

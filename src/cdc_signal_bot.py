@@ -7,11 +7,17 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from discord.ext.commands.core import command
+from mqtt import initializeMQTT
 
 from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals, remove_pairs
 from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, HOUR, MINUTE, SECOND, ADMIN_ID
 
 bot = commands.Bot(command_prefix='!cdc')
+mqttClient = initializeMQTT()
+
+def publish(msg):
+  print('Publishing... MQTT')
+  mqttClient.publish('cdc/signal', msg, qos=1)
 
 async def sendMessage(channel, msg):
   if len(msg) > 1900:
@@ -38,6 +44,8 @@ async def send_update_signal():
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msg += get_signals_with_tf('86400', 0)
     await sendMessage(channel, msg)
+    # Implement mqtt
+    # publish(string of array)
   else:
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msg += get_signals_with_tf('43200', 0)
@@ -136,3 +144,4 @@ async def on_message(message):
 def start():
   init()
   bot.run(BOT_TOKEN)
+  initializeMQTT()
