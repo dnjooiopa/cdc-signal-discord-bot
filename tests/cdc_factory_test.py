@@ -33,4 +33,6 @@ def start_test():
   print(remove_pairs('waxpusdt'))
 
   print("=== Get signal with tf ===")
-  print(get_signals_with_tf('86400', 0))
+  msg, msgObj = get_signals_with_tf('86400', 0)
+  print(msg)
+  print(msgObj)
