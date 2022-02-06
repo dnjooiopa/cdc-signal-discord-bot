@@ -146,22 +146,33 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
   formatTime = get_format_time(timestamp)
   msg = ''
   exName = crypto['exchange_indexes'][pairs].upper()
+  msgObj = {}
   if buy:
       msg = f'\n{formatTime} : {exName} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
+      msgObj = {'pairs': pairs, 'ex_name': exName, 'order': 'buy'}
   elif sell:
       msg = f'\n{formatTime} : {exName} : {pairs.upper()} : SELL 🔴 at {closingPrice}$'
+      msgObj = {'pairs': pairs, 'ex_name': exName, 'order': 'sell'}
 
-  return msg
+  return msg, msgObj
 
 def get_signals_with_tf(tf, dayOffset):
     msg = f'\n📈 Time frame {TF_NAME[tf]}'
-
+    signalPayload = []
     for pairs in crypto['exchange_indexes'].keys():
-        signalMsg = get_signal_with_pairs(tf, pairs, dayOffset)
+        signalMsg, msgObj = get_signal_with_pairs(tf, pairs, dayOffset)
         msg += signalMsg
+
+        if msgObj['ex_name'] == 'binance':
+          signalPayload.append({
+            'asset_name': msgObj['pairs'].replace('usdt', ''),
+            'pair_name': 'busd',
+            'order': msgObj['order']
+          })
+
     if 'BUY' not in msg and 'SELL' not in msg:
         msg += '\nNo signal'
-    return msg
+    return msg, signalPayload
 
 def get_historical_signal(pairs):
   if pairs not in crypto['pairs']:
@@ -200,7 +211,7 @@ def get_historical_signal_data(tf, pairs):
 def get_all_signals(dayOffset):
     msg = ''
     for tf in crypto['time_frames']:
-      signalMsg = get_signals_with_tf(tf, dayOffset)
+      signalMsg, _ = get_signals_with_tf(tf, dayOffset)
       msg += signalMsg
 
     return msg
