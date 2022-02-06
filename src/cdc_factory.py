@@ -149,10 +149,10 @@ def get_signal_with_pairs(tf, pairs, dayOffset):
   msgObj = {}
   if buy:
       msg = f'\n{formatTime} : {exName} : {pairs.upper()} : BUY 🟢 at {closingPrice}$'
-      msgObj = {'pairs': pairs, 'ex_name': exName, 'order': 'buy'}
+      msgObj = {'pairs': pairs, 'ex_name': exName.lower(), 'order': 'buy'}
   elif sell:
       msg = f'\n{formatTime} : {exName} : {pairs.upper()} : SELL 🔴 at {closingPrice}$'
-      msgObj = {'pairs': pairs, 'ex_name': exName, 'order': 'sell'}
+      msgObj = {'pairs': pairs, 'ex_name': exName.lower(), 'order': 'sell'}
 
   return msg, msgObj
 
@@ -163,7 +163,7 @@ def get_signals_with_tf(tf, dayOffset):
         signalMsg, msgObj = get_signal_with_pairs(tf, pairs, dayOffset)
         msg += signalMsg
 
-        if msgObj['ex_name'] == 'binance':
+        if msgObj != {} and msgObj['ex_name'] == 'binance':
           signalPayload.append({
             'asset_name': msgObj['pairs'].replace('usdt', ''),
             'pair_name': 'busd',
