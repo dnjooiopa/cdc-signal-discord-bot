@@ -103,6 +103,9 @@ async def on_message(message):
       if commands[1] == 'update':
         refetch()
         msg, sinalPayload = get_signals_with_tf('86400', 0)
+      elif commands[1] == 'trader':
+        refetch()
+        msg, sinalPayload = get_signals_with_tf('86400', 0)
         publish(json.dumps(sinalPayload))
       elif commands[1] == 'future':
         msg, _ = get_signals_with_tf('86400', 1)
