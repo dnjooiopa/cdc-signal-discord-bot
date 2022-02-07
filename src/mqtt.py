@@ -10,11 +10,9 @@ def on_connect_fail(client, userdata, flags, rc, properties=None):
   print("🔴 MQTT failed received with code %s." % rc)
 
 def on_publish(client, userdata, mid, properties=None):
-  #print("mid: " + str(mid))
-  pass
+  client.disconnect()
 
 def on_subscribe(client, userdata, mid, granted_qos, properties=None):
-  #print("✅Subscribed: " + str(mid) + " " + str(granted_qos))
   pass
 
 def on_message(client, userdata, msg):
@@ -34,9 +32,5 @@ def initializeMQTT():
   client.on_message = on_message
   client.on_publish = on_publish
   client.on_connect_fail = on_connect_fail
-
-  client.subscribe("cdc/#", qos=1)
-
-  client.loop_forever()
 
   return client

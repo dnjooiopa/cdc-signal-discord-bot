@@ -3,6 +3,7 @@ from discord.ext import commands
 from datetime import datetime
 import os
 import time
+import json
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -13,11 +14,12 @@ from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabe
 from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, HOUR, MINUTE, SECOND, ADMIN_ID
 
 bot = commands.Bot(command_prefix='!cdc')
-mqttClient = initializeMQTT()
 
 def publish(msg):
   print('Publishing... MQTT')
+  mqttClient = initializeMQTT()
   mqttClient.publish('cdc/signal', msg, qos=1)
+  mqttClient.loop_forever()
 
 async def sendMessage(channel, msg):
   if len(msg) > 1900:
@@ -45,7 +47,7 @@ async def send_update_signal():
     msgSignal, signalPayload = get_signals_with_tf('86400', 0)
     msg += msgSignal
     await sendMessage(channel, msg)
-    publish(str(signalPayload))
+    publish(json.dumps(signalPayload))
   else:
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msgSignal, signalPayload = get_signals_with_tf('43200', 0)
@@ -100,7 +102,8 @@ async def on_message(message):
     elif len(commands) == 2:
       if commands[1] == 'update':
         refetch()
-        msg, _ = get_signals_with_tf('86400', 0)
+        msg, sinalPayload = get_signals_with_tf('86400', 0)
+        publish(json.dumps(sinalPayload))
       elif commands[1] == 'future':
         msg, _ = get_signals_with_tf('86400', 1)
       elif commands[1] == 'pairs' or commands[1] == 'list':
@@ -145,4 +148,3 @@ async def on_message(message):
 def start():
   init()
   bot.run(BOT_TOKEN)
-  initializeMQTT()
