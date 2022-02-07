@@ -10,6 +10,7 @@ def on_connect_fail(client, userdata, flags, rc, properties=None):
   print("🔴 MQTT failed received with code %s." % rc)
 
 def on_publish(client, userdata, mid, properties=None):
+  print('🚀 On publish 🚀')
   client.disconnect()
 
 def on_subscribe(client, userdata, mid, granted_qos, properties=None):
