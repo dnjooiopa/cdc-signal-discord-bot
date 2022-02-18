@@ -15,11 +15,12 @@ from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, 
 
 bot = commands.Bot(command_prefix='!cdc')
 
+mqttClient = initializeMQTT()
+
 def publish(msg):
   print('Publishing... MQTT')
-  mqttClient = initializeMQTT()
-  mqttClient.publish('cdc/signal', msg, qos=1)
-  mqttClient.loop_forever()
+  result = mqttClient.publish('cdc/signal', msg, qos=1, retain=True)
+  result.wait_for_publish(timeout=10)
 
 async def sendMessage(channel, msg):
   if len(msg) > 1900:
@@ -46,8 +47,8 @@ async def send_update_signal():
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msgSignal, signalPayload = get_signals_with_tf('86400', 0)
     msg += msgSignal
-    await sendMessage(channel, msg)
     publish(json.dumps(signalPayload))
+    await sendMessage(channel, msg)
   else:
     channel = bot.get_channel(int(CRYPTO_CHANNEL))
     msgSignal, signalPayload = get_signals_with_tf('43200', 0)
