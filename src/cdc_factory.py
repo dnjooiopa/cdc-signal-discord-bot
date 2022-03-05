@@ -39,7 +39,7 @@ def calculate_ema(prices, days, smoothing=2):
 
 def make_request(url):
   sess = Session()
-  response = sess.get(url, params=parameters)
+  response = sess.get(url, params=parameters, verify=False)
   responseData = json.loads(response.text)
   if 'error' in responseData:
     return None
@@ -53,6 +53,7 @@ def fetch_crypto_pairs(pairs):
   for ex in crypto['exchanges']:
     url = f'https://api.cryptowat.ch/markets/{ex}/{pairs}/ohlc'
     result = make_request(url)
+    time.sleep(0.2)
     if result is not None:
       exName = ex
       break
