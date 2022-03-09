@@ -1,17 +1,16 @@
-import discord
-from discord.ext import commands
 from datetime import datetime
 import os
 import time
 import json
 
+import discord
+from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from discord.ext.commands.core import command
 from src.mqtt import initializeMQTT
 
-from src.cdc_factory import add_pairs, check_pairs, generate_graph, get_availabel_exchange, get_availabel_pairs, get_historical_signal, init, refetch, get_signals_with_tf, get_all_signals, remove_pairs
-from config import CRYPTO_CHANNEL, BOT_TOKEN, UNKNOWN_MESSAGE, WELCOME_MESSAGE, HOUR, MINUTE, SECOND, ADMIN_ID
+import src.cdc_factory as cdcFactory
+import config
 
 bot = commands.Bot(command_prefix='!cdc')
 
@@ -39,19 +38,19 @@ async def send_update_signal():
   
   currentLocalTime = get_local_time(timestamp)
 
-  refetch()
+  cdcFactory.refetch()
   print('Sending... update')
   msg = f'\n✅ Authomatic update: {currentLocalTime}'
   
   if currentUTCTime == "00:00":
-    channel = bot.get_channel(int(CRYPTO_CHANNEL))
-    msgSignal, signalPayload = get_signals_with_tf('86400', 0)
+    channel = bot.get_channel(int(config.CRYPTO_CHANNEL))
+    msgSignal, signalPayload = cdcFactory.get_signals_with_tf('86400', 0)
     msg += msgSignal
     publish(json.dumps(signalPayload))
     await sendMessage(channel, msg)
   else:
-    channel = bot.get_channel(int(CRYPTO_CHANNEL))
-    msgSignal, signalPayload = get_signals_with_tf('43200', 0)
+    channel = bot.get_channel(int(config.CRYPTO_CHANNEL))
+    msgSignal, signalPayload = cdcFactory.get_signals_with_tf('43200', 0)
     msg += msgSignal
     await sendMessage(channel, msg)
 
@@ -66,7 +65,7 @@ async def send_graph(channel, pairs, tfName):
     tf = '86400'
   
   if tf is not None:
-    msg = generate_graph(pairs, tf)
+    msg = cdcFactory.generate_graph(pairs, tf)
     if msg is None:
       image = discord.File(os.path.join(os.getcwd(), "data", 'graph.png'))
       await channel.send(file=image)
@@ -80,7 +79,7 @@ async def on_ready():
   print("Bot Started!")
 
   scheduler = AsyncIOScheduler()
-  scheduler.add_job(send_update_signal, CronTrigger(hour=HOUR, minute=MINUTE, second=SECOND))
+  scheduler.add_job(send_update_signal, CronTrigger(hour=config.HOUR, minute=config.MINUTE, second=config.SECOND))
 
   scheduler.start()
 
@@ -90,27 +89,27 @@ async def on_message(message):
   print(message)
 
   msgContent = message.content
-  msg = f'{UNKNOWN_MESSAGE}'
+  msg = f'{config.UNKNOWN_MESSAGE}'
   sent = False
   if msgContent.startswith('!cdc') :
     commands = msgContent.split(' ')
     print('commands:', commands)
 
     if len(commands) == 1:
-      msg = f'🚷 {WELCOME_MESSAGE} 🚀'
+      msg = f'🚷 {config.WELCOME_MESSAGE} 🚀'
       msg += '\n\nℹ️ Use command below for more information.```!cdc info```'
-      msg += get_all_signals(0)
+      msg += cdcFactory.get_all_signals(0)
     elif len(commands) == 2:
       if commands[1] == 'update':
-        refetch()
-        msg, sinalPayload = get_signals_with_tf('86400', 0)
+        cdcFactory.refetch()
+        msg, sinalPayload = cdcFactory.get_signals_with_tf('86400', 0)
       elif commands[1] == 'trader':
-        msg, sinalPayload = get_signals_with_tf('86400', 0)
+        msg, sinalPayload = cdcFactory.get_signals_with_tf('86400', 0)
         publish(json.dumps(sinalPayload))
       elif commands[1] == 'future':
-        msg, _ = get_signals_with_tf('86400', 1)
+        msg, _ = cdcFactory.get_signals_with_tf('86400', 1)
       elif commands[1] == 'pairs' or commands[1] == 'list':
-        msg = get_availabel_pairs()
+        msg = cdcFactory.get_availabel_pairs()
       elif commands[1] == 'info':
         msg = 'รอก่อน กำลังทำ...'
       elif commands[1] == 'checktime':
@@ -118,28 +117,28 @@ async def on_message(message):
         currentLocalTime = get_local_time(timestamp)
         msg = '⏱  ' + currentLocalTime
       elif commands[1] == 'exchange' or commands[1] == 'exchanges' or commands[1] == 'ex':
-        msg = get_availabel_exchange()
+        msg = cdcFactory.get_availabel_exchange()
     elif len(commands) == 3:
       if commands[1] == 'history':
-        msg = get_historical_signal(commands[2].lower())
+        msg = cdcFactory.get_historical_signal(commands[2].lower())
       elif commands[1] == 'add':
-        msg = add_pairs(commands[2].lower())
+        msg = cdcFactory.add_pairs(commands[2].lower())
       elif commands[1] == 'check':
-        msg = check_pairs(commands[2].lower())
+        msg = cdcFactory.check_pairs(commands[2].lower())
       elif commands[1] == 'graph':
         print(commands[2].lower())
         await send_graph(message.channel, commands[2].lower(), '1d')
         sent = True 
       elif commands[1] == 'remove' or commands[1] == 'rm':
-        if message.author.id == ADMIN_ID:
-          msg = remove_pairs(commands[2].lower())
+        if message.author.id == config.ADMIN_ID:
+          msg = cdcFactory.remove_pairs(commands[2].lower())
         else:
           msg = '\n🚫 Only admin can remove pairs'
       if commands[1] == 'update' and commands[2] == 'all':
-        refetch()
-        msg = get_all_signals(0)
+        cdcFactory.refetch()
+        msg = cdcFactory.get_all_signals(0)
       elif commands[1] == 'future'  and commands[2] == 'all':
-        msg = get_all_signals(1)
+        msg = cdcFactory.get_all_signals(1)
     elif len(commands) == 4:
       if commands[1] == 'graph':
         await send_graph(message.channel, commands[2].lower(), commands[3])
@@ -149,5 +148,5 @@ async def on_message(message):
       await sendMessage(message.channel, msg)
 
 def start():
-  init()
-  bot.run(BOT_TOKEN)
+  cdcFactory.init()
+  bot.run(config.BOT_TOKEN)

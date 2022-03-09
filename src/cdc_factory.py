@@ -1,18 +1,19 @@
-from datetime import datetime
 import time
-from requests import Session
 import os
 import json
+from datetime import datetime
+
+from requests import Session
 import matplotlib.pyplot as plt
 
-from config import API_KEY, DAYS
+import config
 
 # Initialize Global Variable
 timeIdx = 0
 closeIdx = 4
 
 current_unix_time = int(time.time())
-days = DAYS
+days = config.DAYS
 
 parameters = {}
 
@@ -343,7 +344,7 @@ def init():
     crypto = open_file('crypto-data.json')
 
   parameters = {
-    'apikey': API_KEY,
+    'apikey': config.API_KEY,
     'after': current_unix_time - (86400*days),
     'periods': ','.join(crypto['time_frames'])
     }
