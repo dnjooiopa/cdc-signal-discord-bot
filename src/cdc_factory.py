@@ -39,12 +39,17 @@ def calculate_ema(prices, days, smoothing=2):
   return ema
 
 def make_request(url):
-  sess = Session()
-  response = sess.get(url, params=parameters, verify=False)
-  responseData = json.loads(response.text)
-  if 'error' in responseData:
+  try:
+    sess = Session()
+    response = sess.get(url, params=parameters, verify=False)
+    responseData = json.loads(response.text)
+    if 'error' in responseData:
+      return None
+    return responseData['result']
+  except Exception as err:
+    print('Fetch error', err)
     return None
-  return responseData['result']
+  
 
 def fetch_crypto_pairs(pairs):
   global cryptoData
